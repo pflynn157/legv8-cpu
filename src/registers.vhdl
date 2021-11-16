@@ -22,14 +22,14 @@ begin
     begin
         -- Source A
         if unsigned(sel_A) = 31 then
-            O_dataA <= X"00000000";
+            O_dataA <= X"00000005";
         else
             O_dataA <= regs(to_integer(unsigned(sel_A)));
         end if;
         
         -- Source 2
         if unsigned(sel_B) = 31 then
-            O_dataB <= X"00000000";
+            O_dataB <= X"00000005";
         else
             O_dataB <= regs(to_integer(unsigned(sel_B)));
         end if;
