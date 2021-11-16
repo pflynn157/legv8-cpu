@@ -4,13 +4,13 @@ use IEEE.std_logic_1164.all;
 entity CPU is
     port (
         clk    : in std_logic;
-        input  : in std_logic_vector(((32 * 12) - 1) downto 0)
+        input  : in std_logic_vector(((32 * 14) - 1) downto 0)
     );
 end CPU;
 
 architecture Behavior of CPU is
     -- The size of our instruction memory
-    constant INSTR_COUNT : integer := 12;
+    constant INSTR_COUNT : integer := 14;
     constant MEM_SIZE : integer := (32 * INSTR_COUNT) - 1;
     
     -- Declare the decoder component
@@ -93,7 +93,7 @@ architecture Behavior of CPU is
     signal Zero : std_logic;
     
     -- Various control lines
-    signal srcB, srcShamt : std_logic := '0';                    -- 0 = reg, 1 = imm
+    signal srcB, srcB2, srcShamt : std_logic := '0';                    -- 0 = reg, 1 = imm
     signal RegWrite, Reg2Loc : std_logic := '0';                -- 0 = no write, 1 = write
     signal ALU_Op1 : std_logic_vector(3 downto 0);
 begin
@@ -230,8 +230,18 @@ begin
                             ALU_Op1 <= "0010";
                             RegWrite <= '1';
                             Reg2Loc <= '0';
+                            srcShamt <= '0';
                             
                         -- SUBI
+                        when "1101000100" =>
+                            sel_A <= Rn;
+                            sel_D_1 <= Rd;
+                            Imm2 <= Imm;
+                            srcB <= '1';
+                            ALU_Op1 <= "0110";
+                            RegWrite <= '1';
+                            Reg2Loc <= '0';
+                            srcShamt <= '0';
                         
                         when others =>
                         
