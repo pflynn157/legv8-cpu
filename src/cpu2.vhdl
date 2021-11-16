@@ -48,6 +48,18 @@ architecture Behavior of CPU2 is
         );
     end component;
     
+    -- Declare the ALU component
+    component ALU is
+        port (
+            clk    : in std_logic;
+            A      : in std_logic_vector(31 downto 0);
+            B      : in std_logic_vector(31 downto 0);
+            ALU_Op : in std_logic_vector(3 downto 0);
+            Zero   : out std_logic;
+            Result : out std_logic_vector(31 downto 0)
+        );
+    end component;
+    
     -----------------
     -- Our signals --
     -----------------
@@ -56,10 +68,6 @@ architecture Behavior of CPU2 is
     signal PC : integer := 0;
     signal done : std_logic := '0';
     
-    -- Various control signals
-    signal RegWrite : std_logic := '0';
-    signal Reg2Loc : std_logic := '0';
-    
     -- Signals for the decoder
     signal instr : std_logic_vector(31 downto 0) := X"00000000";
     signal R_opcode, D_opcode : std_logic_vector(10 downto 0);
@@ -67,8 +75,8 @@ architecture Behavior of CPU2 is
     signal B_opcode : std_logic_vector(5 downto 0);
     signal CB_opcode : std_logic_vector(7 downto 0);
     signal Rm, Rn, Rd : std_logic_vector(4 downto 0);
-    signal shamt : std_logic_vector(5 downto 0);
-    signal Imm : std_logic_vector(11 downto 0);
+    signal shamt, shamt2 : std_logic_vector(5 downto 0);
+    signal Imm, Imm2 : std_logic_vector(11 downto 0);
     signal DT_address : std_logic_vector(8 downto 0);
     signal DT_op : std_logic_vector(1 downto 0);
     signal BR_address : std_logic_vector(25 downto 0);
@@ -78,6 +86,16 @@ architecture Behavior of CPU2 is
     signal sel_A, sel_B, sel_D, sel_D_1, sel_D_2 : std_logic_vector(4 downto 0);
     signal I_dataD, O_dataA, O_dataB : std_logic_vector(31 downto 0);
     signal I_enD : std_logic := '0';
+    
+    -- Signals for the ALU
+    signal A, B, Result : std_logic_vector(31 downto 0);
+    signal ALU_Op : std_logic_vector(3 downto 0);
+    signal Zero : std_logic;
+    
+    -- Various control lines
+    signal srcB, srcShamt : std_logic := '0';                    -- 0 = reg, 1 = imm
+    signal RegWrite, Reg2Loc : std_logic := '0';                -- 0 = no write, 1 = write
+    signal ALU_Op1 : std_logic_vector(3 downto 0);
 begin
     -- Map the decoder
     decode : Decoder port map (
@@ -110,13 +128,24 @@ begin
         O_dataB => O_dataB
     );
     
+    -- Map the ALU
+    compALU : ALU port map (
+        clk => clk,
+        A => A,
+        B => B,
+        ALU_Op => ALU_Op,
+        Zero => Zero,
+        Result => Result
+    );
+    
     process (clk)
     begin
         if rising_edge(clk) then
             -- Instruction fetch
             for stage in 1 to 5 loop
                 -- Instruction fetch
-                if stage = 1 and done = '0' then
+                --if stage = 1 and done = '0' then
+                if stage = 1 then
                     instr <= input((PC + 31) downto PC);
                     if PC + 32 <= MEM_SIZE then
                         PC <= PC + 32;
@@ -130,55 +159,63 @@ begin
                     case (R_opcode) is
                         -- Add
                         when "10001011000" =>
-                            --sel_A <= Rm;
-                            --sel_B <= Rn;
-                            --sel_D <= Rd;
-                            --srcB <= '0';
-                            --ALU_Op1 <= "0010";
-                            --RegWrite <= '1';
+                            sel_A <= Rm;
+                            sel_B <= Rn;
+                            sel_D_1 <= Rd;
+                            srcB <= '0';
+                            ALU_Op1 <= "0010";
+                            RegWrite <= '1';
+                            Reg2Loc <= '0';
                             
                         -- SUB
                         when "11001011000" =>
-                            --sel_A <= Rm;
-                            --sel_B <= Rn;
-                            --sel_D <= Rd;
-                            --srcB <= '0';
-                            --ALU_Op1 <= "0110";
-                            --RegWrite <= '1';
+                            sel_A <= Rm;
+                            sel_B <= Rn;
+                            sel_D_1 <= Rd;
+                            srcB <= '0';
+                            ALU_Op1 <= "0110";
+                            RegWrite <= '1';
+                            Reg2Loc <= '0';
                         
                         -- AND
                         when "10001010000" =>
-                            --sel_A <= Rm;
-                            --sel_B <= Rn;
-                            --sel_D <= Rd;
-                            --srcB <= '0';
-                            --ALU_Op1 <= "0000";
-                            --RegWrite <= '1';
+                            sel_A <= Rm;
+                            sel_B <= Rn;
+                            sel_D_1 <= Rd;
+                            srcB <= '0';
+                            ALU_Op1 <= "0000";
+                            RegWrite <= '1';
+                            Reg2Loc <= '0';
                         
                         -- OR
                         when "10101010000" =>
-                            --sel_A <= Rm;
-                            --sel_B <= Rn;
-                            --sel_D <= Rd;
-                            --srcB <= '0';
-                            --ALU_Op1 <= "0001";
-                            --RegWrite <= '1';
+                            sel_A <= Rm;
+                            sel_B <= Rn;
+                            sel_D_1 <= Rd;
+                            srcB <= '0';
+                            ALU_Op1 <= "0001";
+                            RegWrite <= '1';
+                            Reg2Loc <= '0';
                         
                         -- LSL
                         when "11010011011" =>
-                            --sel_A <= Rn;
-                            --sel_D <= Rd;
-                            --srcShamt <= '1';
-                            --ALU_Op1 <= "1100";
-                            --RegWrite <= '1';
+                            sel_A <= Rn;
+                            sel_D_1 <= Rd;
+                            srcShamt <= '1';
+                            ALU_Op1 <= "1100";
+                            RegWrite <= '1';
+                            Reg2Loc <= '0';
+                            shamt2 <= shamt;
                         
                         -- LSR
                         when "11010011010" =>
-                            --sel_A <= Rn;
-                            --sel_D <= Rd;
-                            --srcShamt <= '1';
-                            --ALU_Op1 <= "1101";
-                            --RegWrite <= '1';
+                            sel_A <= Rn;
+                            sel_D_1 <= Rd;
+                            srcShamt <= '1';
+                            ALU_Op1 <= "1101";
+                            RegWrite <= '1';
+                            Reg2Loc <= '0';
+                            shamt2 <= shamt;
                     
                         when others =>
                         
@@ -186,11 +223,13 @@ begin
                     case (I_opcode) is
                         -- ADDI
                         when "1001000100" =>
-                            --sel_A <= Rn;
-                            --sel_D <= Rd;
-                            --srcB <= '1';
-                            --ALU_Op1 <= "0010";
-                            --RegWrite <= '1';
+                            sel_A <= Rn;
+                            sel_D_1 <= Rd;
+                            Imm2 <= Imm;
+                            srcB <= '1';
+                            ALU_Op1 <= "0010";
+                            RegWrite <= '1';
+                            Reg2Loc <= '0';
                             
                         -- SUBI
                         
@@ -205,7 +244,6 @@ begin
                         -- MOV
                         when "11010010100" =>
                             sel_A <= Rn;
-                            sel_D <= Rd;
                             sel_D_1 <= Rd;
                             RegWrite <= '1';
                             Reg2Loc <= '1';
@@ -238,6 +276,16 @@ begin
                     sel_D_2 <= sel_D_1;
                     if Reg2Loc = '1' then
                         I_dataD <= O_dataA;
+                    else
+                        ALU_Op <= ALU_Op1;
+                        A <= O_dataA;
+                        if srcShamt = '1' then
+                            B <= X"000000" & "00" & shamt2;
+                        elsif srcB = '1' then
+                            B <= "00000000000000000000" & Imm2;
+                        else
+                            B <= O_dataB;
+                        end if;
                     end if;
                     
                 -- Memory read/write
@@ -246,6 +294,9 @@ begin
                 -- Register write_back
                 elsif stage = 5 then
                     if RegWrite = '1' then
+                        if Reg2Loc = '0' then
+                            I_dataD <= Result;
+                        end if;
                         sel_D <= sel_D_2;
                         I_enD <= '1';
                     else

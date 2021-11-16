@@ -28,8 +28,6 @@ compile:
 
 run:
 	cd sim; \
-	ghdl -r $(GHDL_FLAGS) reg_tb $(GHDL_STOP) --wave=wave_reg.ghw; \
-	ghdl -r $(GHDL_FLAGS) cpu_tb $(GHDL_STOP) --wave=wave_cpu.ghw; \
 	ghdl -r $(GHDL_FLAGS) cpu2_tb $(GHDL_STOP) --wave=wave_cpu2.ghw; \
 	cd ..
 

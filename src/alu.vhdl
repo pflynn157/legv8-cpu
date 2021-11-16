@@ -4,6 +4,7 @@ use IEEE.numeric_std.all;
 
 entity ALU is
     port (
+        clk    : in std_logic;
         A      : in std_logic_vector(31 downto 0);
         B      : in std_logic_vector(31 downto 0);
         ALU_Op : in std_logic_vector(3 downto 0);
@@ -15,7 +16,7 @@ end ALU;
 architecture Behavior of ALU is
     signal shift : std_logic_vector(2 downto 0) := "001";
 begin
-    process (A, B, ALU_Op)
+    process (clk)
     begin
         case ALU_Op is
             -- AND

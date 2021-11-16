@@ -19,9 +19,8 @@ architecture Behavior of registers is
     type register_file is array (0 to 31) of std_logic_vector(31 downto 0);
     signal regs : register_file := (others => X"00000000");
 begin
-    process (clk)
+    process(sel_A, sel_B, sel_D, I_dataD, I_enD, clk)
     begin
-        if rising_edge(clk) then
         -- Source A
         if unsigned(sel_A) = 31 then
             O_dataA <= X"00000000";
@@ -39,7 +38,6 @@ begin
         -- Write to the register if enable
         if I_enD = '1' then
             regs(to_integer(unsigned(sel_D))) <= I_dataD;
-        end if;
         end if;
     end process;
 end Behavior;
