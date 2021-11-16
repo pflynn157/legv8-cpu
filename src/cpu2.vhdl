@@ -37,6 +37,7 @@ architecture Behavior of CPU2 is
     -- Declare the register component
     component Registers is
         port (
+            clk     : in std_logic;
             sel_A   : in std_logic_vector(4 downto 0);      -- Register A (source 1)
             sel_B   : in std_logic_vector(4 downto 0);      -- Register B (source 2)
             sel_D   : in std_logic_vector(4 downto 0);      -- Register D
@@ -56,8 +57,8 @@ architecture Behavior of CPU2 is
     signal done : std_logic := '0';
     
     -- Various control signals
-    signal ID_en, EX_en, MEM_en, WB_en : std_logic := '0';
-    signal RegWrite, Reg2Loc : std_logic := '0';
+    signal RegWrite : std_logic := '0';
+    signal Reg2Loc : std_logic := '0';
     
     -- Signals for the decoder
     signal instr : std_logic_vector(31 downto 0) := X"00000000";
@@ -74,7 +75,7 @@ architecture Behavior of CPU2 is
     signal CBR_address : std_logic_vector(18 downto 0);
     
     -- Signals for the registers
-    signal sel_A, sel_B, sel_D : std_logic_vector(4 downto 0);
+    signal sel_A, sel_B, sel_D, sel_D_1, sel_D_2 : std_logic_vector(4 downto 0);
     signal I_dataD, O_dataA, O_dataB : std_logic_vector(31 downto 0);
     signal I_enD : std_logic := '0';
 begin
@@ -99,6 +100,7 @@ begin
     
     -- Map the registers
     regs : Registers port map (
+        clk => clk,
         sel_A => sel_A,
         sel_B => sel_B,
         sel_D => sel_D,
@@ -110,26 +112,20 @@ begin
     
     process (clk)
     begin
-        if rising_edge(clk) and done = '0' then
+        if rising_edge(clk) then
             -- Instruction fetch
             for stage in 1 to 5 loop
                 -- Instruction fetch
-                if stage = 1 then
+                if stage = 1 and done = '0' then
                     instr <= input((PC + 31) downto PC);
-                    ID_en <= '1';
                     if PC + 32 <= MEM_SIZE then
                         PC <= PC + 32;
                     else
                         done <= '1';
                     end if;
                     
-                    -- Reset signals
-                    RegWrite <= '0';
-                    Reg2Loc <= '0';
-                    
                 -- Instruction decode
-                elsif stage = 2 and ID_en = '1' then
-                    EX_en <= '1';
+                elsif stage = 2 then
                     -- R-format instructons
                     case (R_opcode) is
                         -- Add
@@ -210,8 +206,9 @@ begin
                         when "11010010100" =>
                             sel_A <= Rn;
                             sel_D <= Rd;
-                            RegWrite1 <= '1';
-                            Reg2Loc1 <= '1';
+                            sel_D_1 <= Rd;
+                            RegWrite <= '1';
+                            Reg2Loc <= '1';
                         
                         when others =>
                         
@@ -237,22 +234,20 @@ begin
                     end case; -- case R_opcode
                 
                 -- Instruction execute
-                elsif stage = 3 and EX_en = '1' then
-                    MEM_en <= '1';
+                elsif stage = 3 then
+                    sel_D_2 <= sel_D_1;
+                    if Reg2Loc = '1' then
+                        I_dataD <= O_dataA;
+                    end if;
                     
                 -- Memory read/write
-                elsif stage = 4 and MEM_en = '1' then
-                    WB_en <= '1';
+                elsif stage = 4 then
                 
                 -- Register write_back
-                elsif stage = 5 and WB_en = '1' then
-                    if RegWrite2 = '1' then
+                elsif stage = 5 then
+                    if RegWrite = '1' then
+                        sel_D <= sel_D_2;
                         I_enD <= '1';
-                        if Reg2Loc2 = '1' then
-                            I_dataD <= O_dataA;
-                        else
-                        
-                        end if;
                     else
                         I_enD <= '0';
                     end if;
