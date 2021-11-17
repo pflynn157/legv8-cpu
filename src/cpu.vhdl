@@ -4,13 +4,13 @@ use IEEE.std_logic_1164.all;
 entity CPU is
     port (
         clk    : in std_logic;
-        input  : in std_logic_vector(((32 * 16) - 1) downto 0)
+        input  : in std_logic_vector(((32 * 20) - 1) downto 0)
     );
 end CPU;
 
 architecture Behavior of CPU is
     -- The size of our instruction memory
-    constant INSTR_COUNT : integer := 16;
+    constant INSTR_COUNT : integer := 20;
     constant MEM_SIZE : integer := (32 * INSTR_COUNT) - 1;
     
     -- Declare the decoder component
@@ -112,6 +112,7 @@ architecture Behavior of CPU is
     signal srcB, srcB2, srcShamt, srcAddr : std_logic := '0';                    -- 0 = reg, 1 = imm
     signal RegWrite, RegWrite2, Reg2Loc : std_logic := '0';                -- 0 = no write, 1 = write
     signal MemWrite, MemWrite2 : std_logic := '0';
+    signal MemRead, MemRead2 : std_logic := '0';
     signal ALU_Op1 : std_logic_vector(3 downto 0);
     signal MemData : std_logic_vector(31 downto 0) := X"00000000";
 begin
@@ -188,6 +189,7 @@ begin
                     sel_D_1 <= Rd;
                     srcB <= '0';
                     MemWrite <= '0';
+                    MemRead <= '0';
                     srcAddr <= '0';
                     Reg2Loc <= '0';
                     RegWrite <= '0';
@@ -261,6 +263,11 @@ begin
                     case (D_opcode) is
                         -- LDUR
                         when "11111000010" =>
+                            ALU_Op1 <= "0010";
+                            MemRead <= '1';
+                            srcAddr <= '1';
+                            DT_Address2 <= DT_Address;
+                            RegWrite <= '1';
                         
                         -- STUR
                         when "11111000000" =>
@@ -304,6 +311,7 @@ begin
                     sel_D_2 <= sel_D_1;
                     RegWrite2 <= RegWrite;
                     MemWrite2 <= MemWrite;
+                    MemRead2 <= MemRead;
                     MemData <= O_dataB;
                     
                     if Reg2Loc = '1' then
@@ -331,12 +339,20 @@ begin
                     else
                         I_write <= '0';
                     end if;
+                    
+                    if MemRead2 = '1' then
+                        Address <= Result;
+                    end if;
                 
                 -- Register write_back
                 elsif stage = 5 then
                     if RegWrite2 = '1' then
                         if Reg2Loc = '0' then
-                            I_dataD <= Result;
+                            if MemRead2 = '1' then
+                                I_dataD <= O_data;
+                            else
+                                I_dataD <= Result;
+                            end if;
                         end if;
                         sel_D <= sel_D_2;
                         I_enD <= '1';

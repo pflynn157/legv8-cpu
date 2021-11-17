@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.108 (w)1999-2020 BSI
-[*] Wed Nov 17 19:09:06 2021
+[*] Wed Nov 17 19:53:23 2021
 [*]
 [dumpfile] "/home/patrick/Projects/legv8_cpu/sim/wave_cpu.ghw"
-[dumpfile_mtime] "Wed Nov 17 19:08:53 2021"
-[dumpfile_size] 129038
+[dumpfile_mtime] "Wed Nov 17 19:52:39 2021"
+[dumpfile_size] 130438
 [savefile] "/home/patrick/Projects/legv8_cpu/cpu.gtkw"
-[timestart] 12200000
+[timestart] 0
 [size] 1920 998
 [pos] -1 -1
-*-24.639965 160000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-25.057394 184500000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.cpu_tb.
 [treeopen] top.cpu_tb.uut.
