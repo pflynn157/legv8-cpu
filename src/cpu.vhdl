@@ -4,13 +4,13 @@ use IEEE.std_logic_1164.all;
 entity CPU is
     port (
         clk    : in std_logic;
-        input  : in std_logic_vector(((32 * 14) - 1) downto 0)
+        input  : in std_logic_vector(((32 * 15) - 1) downto 0)
     );
 end CPU;
 
 architecture Behavior of CPU is
     -- The size of our instruction memory
-    constant INSTR_COUNT : integer := 14;
+    constant INSTR_COUNT : integer := 15;
     constant MEM_SIZE : integer := (32 * INSTR_COUNT) - 1;
     
     -- Declare the decoder component
@@ -60,6 +60,17 @@ architecture Behavior of CPU is
         );
     end component;
     
+    -- Declare the Memory component
+    component Memory is
+        port (
+            clk     : in std_logic;
+            I_write : in std_logic;
+            address : in std_logic_vector(10 downto 0);
+            I_data  : in std_logic_vector(31 downto 0);
+            O_data  : out std_logic_vector(31 downto 0)
+        );
+    end component;
+    
     -----------------
     -- Our signals --
     -----------------
@@ -77,7 +88,7 @@ architecture Behavior of CPU is
     signal Rm, Rn, Rd : std_logic_vector(4 downto 0);
     signal shamt, shamt2 : std_logic_vector(5 downto 0);
     signal Imm, Imm2 : std_logic_vector(11 downto 0);
-    signal DT_address : std_logic_vector(8 downto 0);
+    signal DT_address, DT_address2 : std_logic_vector(8 downto 0);
     signal DT_op : std_logic_vector(1 downto 0);
     signal BR_address : std_logic_vector(25 downto 0);
     signal CBR_address : std_logic_vector(18 downto 0);
@@ -92,9 +103,15 @@ architecture Behavior of CPU is
     signal ALU_Op : std_logic_vector(3 downto 0);
     signal Zero : std_logic;
     
+    -- Signals for the memory
+    signal I_write : std_logic := '0';
+    signal address : std_logic_vector(10 downto 0) := "00000000000";
+    signal I_data, O_data : std_logic_vector(31 downto 0) := X"00000000";
+    
     -- Various control lines
-    signal srcB, srcB2, srcShamt : std_logic := '0';                    -- 0 = reg, 1 = imm
+    signal srcB, srcB2, srcShamt, srcAddr : std_logic := '0';                    -- 0 = reg, 1 = imm
     signal RegWrite, Reg2Loc : std_logic := '0';                -- 0 = no write, 1 = write
+    signal MemWrite : std_logic := '0';
     signal ALU_Op1 : std_logic_vector(3 downto 0);
 begin
     -- Map the decoder
@@ -138,6 +155,15 @@ begin
         Result => Result
     );
     
+    -- Map the memory
+    mem_block : Memory port map (
+        clk => clk,
+        I_write => I_write,
+        address => address,
+        I_data => I_data,
+        O_data => O_data
+    );
+    
     process (clk)
     begin
         if rising_edge(clk) then
@@ -155,6 +181,10 @@ begin
                     
                 -- Instruction decode
                 elsif stage = 2 then
+                    -- Zero out inputs
+                    MemWrite <= '0';
+                    srcAddr <= '0';
+                
                     -- R-format instructons
                     case (R_opcode) is
                         -- Add
@@ -248,8 +278,21 @@ begin
                     -- D format instructions
                     case (D_opcode) is
                         -- LDUR
+                        when "11111000010" =>
                         
                         -- STUR
+                        when "11111000000" =>
+                            sel_A <= Rn;
+                            sel_D_1 <= Rd;
+                            srcB <= '0';
+                            ALU_Op1 <= "0010";
+                            --RegWrite <= '0';
+                            --Reg2Loc <= '0';
+                            --srcShamt <= '0';
+                            MemWrite <= '1';
+                            srcAddr <= '1';
+                            DT_Address2 <= DT_Address;
+                            
                         
                         -- MOV
                         when "11010010100" =>
@@ -293,6 +336,8 @@ begin
                             B <= X"000000" & "00" & shamt2;
                         elsif srcB = '1' then
                             B <= "00000000000000000000" & Imm2;
+                        elsif srcAddr = '1' then
+                            B <=  "00000000000000000000000" & DT_Address2;
                         else
                             B <= O_dataB;
                         end if;
@@ -300,6 +345,12 @@ begin
                     
                 -- Memory read/write
                 elsif stage = 4 then
+                    if MemWrite = '1' then
+                        I_data <= O_dataA;
+                        I_write <= '1';
+                    else
+                        I_write <= '0';
+                    end if;
                 
                 -- Register write_back
                 elsif stage = 5 then

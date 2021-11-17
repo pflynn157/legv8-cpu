@@ -5,7 +5,7 @@ entity cpu_tb is
 end cpu_tb;
 
 architecture Behavior of cpu_tb is
-    constant INSTR_COUNT : integer := 14;
+    constant INSTR_COUNT : integer := 15;
     constant MEM_SIZE : integer := (32 * INSTR_COUNT) - 1;
 
     -- The CPU
@@ -26,9 +26,11 @@ architecture Behavior of cpu_tb is
     constant MOV : std_logic_vector := "1101001010000000000000";
     constant ADDI : std_logic_vector := "1001000100";
     constant SUBI : std_logic_vector := "1101000100";
+    constant STUR : std_logic_vector := "11111000000";
     
     signal clk : std_logic := '0';
     signal input : std_logic_vector(MEM_SIZE downto 0) :=
+          STUR & "000000000" & "00" & "00001" & "00010" &         -- STUR X3, [X2, #0]
           SUBI & "000000000101" & "00010" & "00100" &             -- SUBI X4, X2, #5  == 5
           ADDI & "000000000101" & "00010" & "00100" &             -- ADDI X4, X2, #5  == 15
           R_LSR & "00000" & "000010" & "00000" & "00100" &        -- LSR X4, X0, #2 == 1
