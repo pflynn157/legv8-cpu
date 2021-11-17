@@ -4,13 +4,13 @@ use IEEE.std_logic_1164.all;
 entity CPU is
     port (
         clk    : in std_logic;
-        input  : in std_logic_vector(((32 * 14) - 1) downto 0)
+        input  : in std_logic_vector(((32 * 15) - 1) downto 0)
     );
 end CPU;
 
 architecture Behavior of CPU is
     -- The size of our instruction memory
-    constant INSTR_COUNT : integer := 14;
+    constant INSTR_COUNT : integer := 15;
     constant MEM_SIZE : integer := (32 * INSTR_COUNT) - 1;
     
     -- Declare the decoder component
@@ -110,7 +110,7 @@ architecture Behavior of CPU is
     
     -- Various control lines
     signal srcB, srcB2, srcShamt, srcAddr : std_logic := '0';                    -- 0 = reg, 1 = imm
-    signal RegWrite, Reg2Loc : std_logic := '0';                -- 0 = no write, 1 = write
+    signal RegWrite, RegWrite2, Reg2Loc : std_logic := '0';                -- 0 = no write, 1 = write
     signal MemWrite : std_logic := '0';
     signal ALU_Op1 : std_logic_vector(3 downto 0);
 begin
@@ -189,6 +189,8 @@ begin
                     MemWrite <= '0';
                     srcAddr <= '0';
                     Reg2Loc <= '0';
+                    RegWrite <= '0';
+                    srcShamt <= '0';
                 
                     -- R-format instructons
                     case (R_opcode) is
@@ -244,7 +246,6 @@ begin
                             srcB <= '1';
                             ALU_Op1 <= "0010";
                             RegWrite <= '1';
-                            srcShamt <= '0';
                             
                         -- SUBI
                         when "1101000100" =>
@@ -252,7 +253,6 @@ begin
                             srcB <= '1';
                             ALU_Op1 <= "0110";
                             RegWrite <= '1';
-                            srcShamt <= '0';
                         
                         when others =>
                         
@@ -300,6 +300,7 @@ begin
                 -- Instruction execute
                 elsif stage = 3 then
                     sel_D_2 <= sel_D_1;
+                    RegWrite2 <= RegWrite;
                     if Reg2Loc = '1' then
                         I_dataD <= O_dataA;
                     else
@@ -327,7 +328,7 @@ begin
                 
                 -- Register write_back
                 elsif stage = 5 then
-                    if RegWrite = '1' then
+                    if RegWrite2 = '1' then
                         if Reg2Loc = '0' then
                             I_dataD <= Result;
                         end if;
