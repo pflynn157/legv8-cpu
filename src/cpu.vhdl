@@ -4,13 +4,13 @@ use IEEE.std_logic_1164.all;
 entity CPU is
     port (
         clk    : in std_logic;
-        input  : in std_logic_vector(((32 * 15) - 1) downto 0)
+        input  : in std_logic_vector(((32 * 14) - 1) downto 0)
     );
 end CPU;
 
 architecture Behavior of CPU is
     -- The size of our instruction memory
-    constant INSTR_COUNT : integer := 15;
+    constant INSTR_COUNT : integer := 14;
     constant MEM_SIZE : integer := (32 * INSTR_COUNT) - 1;
     
     -- Declare the decoder component
@@ -181,9 +181,14 @@ begin
                     
                 -- Instruction decode
                 elsif stage = 2 then
-                    -- Zero out inputs
+                    -- Zero out and/or set inputs
+                    -- We will reset others as needed
+                    sel_A <= Rn;
+                    sel_D_1 <= Rd;
+                    srcB <= '0';
                     MemWrite <= '0';
                     srcAddr <= '0';
+                    Reg2Loc <= '0';
                 
                     -- R-format instructons
                     case (R_opcode) is
@@ -191,60 +196,42 @@ begin
                         when "10001011000" =>
                             sel_A <= Rm;
                             sel_B <= Rn;
-                            sel_D_1 <= Rd;
-                            srcB <= '0';
                             ALU_Op1 <= "0010";
                             RegWrite <= '1';
-                            Reg2Loc <= '0';
                             
                         -- SUB
                         when "11001011000" =>
                             sel_A <= Rm;
                             sel_B <= Rn;
-                            sel_D_1 <= Rd;
-                            srcB <= '0';
                             ALU_Op1 <= "0110";
                             RegWrite <= '1';
-                            Reg2Loc <= '0';
                         
                         -- AND
                         when "10001010000" =>
                             sel_A <= Rm;
                             sel_B <= Rn;
-                            sel_D_1 <= Rd;
-                            srcB <= '0';
                             ALU_Op1 <= "0000";
                             RegWrite <= '1';
-                            Reg2Loc <= '0';
                         
                         -- OR
                         when "10101010000" =>
                             sel_A <= Rm;
                             sel_B <= Rn;
-                            sel_D_1 <= Rd;
-                            srcB <= '0';
                             ALU_Op1 <= "0001";
                             RegWrite <= '1';
-                            Reg2Loc <= '0';
                         
                         -- LSL
                         when "11010011011" =>
-                            sel_A <= Rn;
-                            sel_D_1 <= Rd;
                             srcShamt <= '1';
                             ALU_Op1 <= "1100";
                             RegWrite <= '1';
-                            Reg2Loc <= '0';
                             shamt2 <= shamt;
                         
                         -- LSR
                         when "11010011010" =>
-                            sel_A <= Rn;
-                            sel_D_1 <= Rd;
                             srcShamt <= '1';
                             ALU_Op1 <= "1101";
                             RegWrite <= '1';
-                            Reg2Loc <= '0';
                             shamt2 <= shamt;
                     
                         when others =>
@@ -253,24 +240,18 @@ begin
                     case (I_opcode) is
                         -- ADDI
                         when "1001000100" =>
-                            sel_A <= Rn;
-                            sel_D_1 <= Rd;
                             Imm2 <= Imm;
                             srcB <= '1';
                             ALU_Op1 <= "0010";
                             RegWrite <= '1';
-                            Reg2Loc <= '0';
                             srcShamt <= '0';
                             
                         -- SUBI
                         when "1101000100" =>
-                            sel_A <= Rn;
-                            sel_D_1 <= Rd;
                             Imm2 <= Imm;
                             srcB <= '1';
                             ALU_Op1 <= "0110";
                             RegWrite <= '1';
-                            Reg2Loc <= '0';
                             srcShamt <= '0';
                         
                         when others =>
@@ -282,13 +263,7 @@ begin
                         
                         -- STUR
                         when "11111000000" =>
-                            sel_A <= Rn;
-                            sel_D_1 <= Rd;
-                            srcB <= '0';
                             ALU_Op1 <= "0010";
-                            --RegWrite <= '0';
-                            --Reg2Loc <= '0';
-                            --srcShamt <= '0';
                             MemWrite <= '1';
                             srcAddr <= '1';
                             DT_Address2 <= DT_Address;
@@ -296,8 +271,6 @@ begin
                         
                         -- MOV
                         when "11010010100" =>
-                            sel_A <= Rn;
-                            sel_D_1 <= Rd;
                             RegWrite <= '1';
                             Reg2Loc <= '1';
                         
