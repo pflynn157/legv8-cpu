@@ -6,7 +6,7 @@ entity Memory is
     port (
         clk     : in std_logic;
         I_write : in std_logic;
-        address : in std_logic_vector(10 downto 0);
+        address : in std_logic_vector(31 downto 0);
         I_data  : in std_logic_vector(31 downto 0);
         O_data  : out std_logic_vector(31 downto 0)
     );

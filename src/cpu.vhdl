@@ -4,13 +4,13 @@ use IEEE.std_logic_1164.all;
 entity CPU is
     port (
         clk    : in std_logic;
-        input  : in std_logic_vector(((32 * 15) - 1) downto 0)
+        input  : in std_logic_vector(((32 * 16) - 1) downto 0)
     );
 end CPU;
 
 architecture Behavior of CPU is
     -- The size of our instruction memory
-    constant INSTR_COUNT : integer := 15;
+    constant INSTR_COUNT : integer := 16;
     constant MEM_SIZE : integer := (32 * INSTR_COUNT) - 1;
     
     -- Declare the decoder component
@@ -65,7 +65,7 @@ architecture Behavior of CPU is
         port (
             clk     : in std_logic;
             I_write : in std_logic;
-            address : in std_logic_vector(10 downto 0);
+            address : in std_logic_vector(31 downto 0);
             I_data  : in std_logic_vector(31 downto 0);
             O_data  : out std_logic_vector(31 downto 0)
         );
@@ -105,14 +105,15 @@ architecture Behavior of CPU is
     
     -- Signals for the memory
     signal I_write : std_logic := '0';
-    signal address : std_logic_vector(10 downto 0) := "00000000000";
+    signal address : std_logic_vector(31 downto 0) := X"00000000";
     signal I_data, O_data : std_logic_vector(31 downto 0) := X"00000000";
     
     -- Various control lines
     signal srcB, srcB2, srcShamt, srcAddr : std_logic := '0';                    -- 0 = reg, 1 = imm
     signal RegWrite, RegWrite2, Reg2Loc : std_logic := '0';                -- 0 = no write, 1 = write
-    signal MemWrite : std_logic := '0';
+    signal MemWrite, MemWrite2 : std_logic := '0';
     signal ALU_Op1 : std_logic_vector(3 downto 0);
+    signal MemData : std_logic_vector(31 downto 0) := X"00000000";
 begin
     -- Map the decoder
     decode : Decoder port map (
@@ -267,6 +268,7 @@ begin
                             MemWrite <= '1';
                             srcAddr <= '1';
                             DT_Address2 <= DT_Address;
+                            sel_B <= Rd;
                             
                         
                         -- MOV
@@ -301,6 +303,9 @@ begin
                 elsif stage = 3 then
                     sel_D_2 <= sel_D_1;
                     RegWrite2 <= RegWrite;
+                    MemWrite2 <= MemWrite;
+                    MemData <= O_dataB;
+                    
                     if Reg2Loc = '1' then
                         I_dataD <= O_dataA;
                     else
@@ -319,8 +324,9 @@ begin
                     
                 -- Memory read/write
                 elsif stage = 4 then
-                    if MemWrite = '1' then
-                        I_data <= O_dataA;
+                    if MemWrite2 = '1' then
+                        Address <= Result;
+                        I_data <= MemData;
                         I_write <= '1';
                     else
                         I_write <= '0';
