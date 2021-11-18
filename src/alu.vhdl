@@ -15,6 +15,7 @@ end ALU;
 
 architecture Behavior of ALU is
     signal shift : std_logic_vector(2 downto 0) := "001";
+    signal Rs1 : std_logic_vector(31 downto 0) := X"00000000";
 begin
     process (clk)
     begin
@@ -36,8 +37,13 @@ begin
             
             -- Sub
             when "0110" =>
-                Zero <= '0';
-                Result <= std_logic_vector(unsigned(A) - unsigned(B));
+                Rs1 <= std_logic_vector(unsigned(A) - unsigned(B));
+                if Rs1 = X"00000000" then
+                    Zero <= '1';
+                else
+                    Zero <= '0';
+                end if;
+                Result <= Rs1;
             
             -- Set on less than
             when "0111" =>

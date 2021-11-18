@@ -4,13 +4,13 @@ use IEEE.std_logic_1164.all;
 entity CPU is
     port (
         clk    : in std_logic;
-        input  : in std_logic_vector(((32 * 20) - 1) downto 0)
+        input  : in std_logic_vector(((32 * 21) - 1) downto 0)
     );
 end CPU;
 
 architecture Behavior of CPU is
     -- The size of our instruction memory
-    constant INSTR_COUNT : integer := 20;
+    constant INSTR_COUNT : integer := 21;
     constant MEM_SIZE : integer := (32 * INSTR_COUNT) - 1;
     
     -- Declare the decoder component
@@ -296,6 +296,7 @@ begin
                     -- CB format instructions
                     case (CB_opcode) is
                         -- CMP
+                        when "10110101" =>
                         
                         -- CBZ
                         

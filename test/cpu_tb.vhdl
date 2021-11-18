@@ -5,7 +5,7 @@ entity cpu_tb is
 end cpu_tb;
 
 architecture Behavior of cpu_tb is
-    constant INSTR_COUNT : integer := 20;
+    constant INSTR_COUNT : integer := 21;
     constant MEM_SIZE : integer := (32 * INSTR_COUNT) - 1;
 
     -- The CPU
@@ -28,9 +28,11 @@ architecture Behavior of cpu_tb is
     constant SUBI : std_logic_vector := "1101000100";
     constant STUR : std_logic_vector := "11111000000";
     constant LDUR : std_logic_vector := "11111000010";
+    constant CMP : std_logic_vector := "10110101";
     
     signal clk : std_logic := '0';
     signal input : std_logic_vector(MEM_SIZE downto 0) :=
+          
           LDUR & "000000000" & "00" & "00001" & "00110" &         -- LDUR X6, [X1, #0]    == MEM(0) = 10 (X6 == 10)
           ADDI & "000000000010" & "00101" & "00101" &             -- ADDI X5, X5, #2  == 12
           R_OR & "00000" & "000000" & "00001" & "00100" &         --  OR X4, X0, X1 == 6 (STALL CYCLE)
@@ -45,6 +47,7 @@ architecture Behavior of cpu_tb is
           R_AND & "00000" & "000000" & "00001" & "00100" &        -- AND X4, X0, X1 == 0        
           SUB & "00010" & "000010" & "00001" & "00100" &          -- SUB X4, X2, X1 == 8
           ADD & "00000" & "000000" & "00001" & "00100" &          -- ADD X4, X0, X1 == 6
+          ADDI & "000000001010" & "11111" & "00011" &             -- ADDI X3, XZR, #10
           ADDI & "000000001010" & "00010" & "00010" &             -- ADDI X2, X2, #10 
           ADDI & "000000000010" & "00001" & "00001" &             -- ADDI X1, X1, #2 
           ADDI & "000000000100" & "00000" & "00000" &             -- ADDI X0, X0, #4 
