@@ -293,6 +293,11 @@ begin
                         when "11010010100" =>
                             RegWrite <= '1';
                             Reg2Loc <= '1';
+                            
+                        -- NOP
+                        -- I doubt this is the actual NOP for Arm; I just made something
+                        -- up because I needed it.
+                        when "11010011111" =>
                         
                         when others =>
                         

@@ -26,6 +26,7 @@ architecture Behavior of cpu_tb is
     constant R_LSL : std_logic_vector := "11010011011";
     constant R_LSR : std_logic_vector := "11010011010";
     constant MOV : std_logic_vector := "1101001010000000000000";
+    constant NOP : std_logic_vector := "1101001111100000000000";
     constant ADDI : std_logic_vector := "1001000100";
     constant SUBI : std_logic_vector := "1101000100";
     constant STUR : std_logic_vector := "11111000000";
@@ -81,15 +82,15 @@ architecture Behavior of cpu_tb is
     constant CODE3_SIZE : integer := 32 * 10 - 1;
     signal code3 : std_logic_vector(CODE3_SIZE downto 0) :=
         CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 100) 10 - 7 = 3
-        ADDI & "000000000011" & "11111" & "00101" &             -- ADDI X5, XZR, #3 (STALL INSTRUCTION)
+        NOP & "0000000000" &                                    -- NOP
         ADDI & "000000001010" & "11111" & "00000" &             -- ADDI X0, XZR, #10
         
         CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 010) 3 - 7 = -4
-        ADDI & "000000000011" & "11111" & "00101" &             -- ADDI X5, XZR, #3 (STALL INSTRUCTION)
+        NOP & "0000000000" &                                    -- NOP
         ADDI & "000000000111" & "11111" & "00001" &             -- ADDI X1, XZR, #7
         
         CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 001) 3-3 = 0
-        ADDI & "000000000011" & "11111" & "00101" &             -- ADDI X5, XZR, #3 (STALL INSTRUCTION)
+        NOP & "0000000000" &                                    -- NOP
         ADDI & "000000000011" & "11111" & "00001" &             -- ADDI X1, XZR, #3
         ADDI & "000000000011" & "11111" & "00000"               -- ADDI X0, XZR, #3
     ;
