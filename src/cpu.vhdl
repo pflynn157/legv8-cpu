@@ -102,7 +102,7 @@ architecture Behavior of CPU is
     signal I_enD : std_logic := '0';
     
     -- Signals for the ALU
-    signal A, B, Result : std_logic_vector(31 downto 0);
+    signal A, B, Result, Result2 : std_logic_vector(31 downto 0);
     signal ALU_Op : std_logic_vector(3 downto 0);
     signal Zero : std_logic;
     
@@ -118,8 +118,11 @@ architecture Behavior of CPU is
     signal MemRead, MemRead2 : std_logic := '0';
     signal ALU_Op1 : std_logic_vector(3 downto 0);
     signal MemData : std_logic_vector(31 downto 0) := X"00000000";
-    
     signal Stall : std_logic := '0';
+    
+    -- Flag-related stuff
+    signal Flags : std_logic_vector(2 downto 0) := "000";   -- GT LT EQ
+    signal SetFlags, SetFlags2 : std_logic := '0';
 begin
     -- Map the decoder
     decode : Decoder port map (
@@ -201,6 +204,7 @@ begin
                     Reg2Loc <= '0';
                     RegWrite <= '0';
                     srcShamt <= '0';
+                    SetFlags <= '0';
                 
                     -- R-format instructons
                     case (R_opcode) is
@@ -308,6 +312,10 @@ begin
                     case (CB_opcode) is
                         -- CMP
                         when "10110101" =>
+                            sel_A <= Rn;
+                            sel_B <= Rd;
+                            ALU_Op1 <= "0110";
+                            SetFlags <= '1';
                         
                         -- CBZ
                         
@@ -329,6 +337,7 @@ begin
                     MemWrite2 <= MemWrite;
                     MemRead2 <= MemRead;
                     MemData <= O_dataB;
+                    SetFlags2 <= SetFlags;
                     
                     if Reg2Loc = '1' then
                         I_dataD <= O_dataA;
@@ -362,6 +371,8 @@ begin
                 
                 -- Register write_back
                 elsif stage = 5 then
+                    
+                    -- Write to the registers
                     if RegWrite2 = '1' then
                         if Reg2Loc = '0' then
                             if MemRead2 = '1' then

@@ -33,11 +33,11 @@ begin
             -- Add
             when "0010" =>
                 Zero <= '0';
-                Result <= std_logic_vector(unsigned(A) + unsigned(B));
+                Result <= std_logic_vector(signed(A) + signed(B));
             
             -- Sub
             when "0110" =>
-                Rs1 <= std_logic_vector(unsigned(A) - unsigned(B));
+                Rs1 <= std_logic_vector(signed(A) - signed(B));
                 if Rs1 = X"00000000" then
                     Zero <= '1';
                 else
@@ -47,7 +47,7 @@ begin
             
             -- Set on less than
             when "0111" =>
-                if unsigned(A) < unsigned(B) then
+                if signed(A) < signed(B) then
                     Zero <= '1';
                 else
                     Zero <= '0';

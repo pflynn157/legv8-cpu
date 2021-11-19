@@ -78,6 +78,19 @@ architecture Behavior of cpu_tb is
           B & "0000000000000000000000" & "0100"                   -- [0] B <4> -> (4 * 32)
     ;
     
+    constant CODE3_SIZE : integer := 32 * 7 - 1;
+    signal code3 : std_logic_vector(CODE3_SIZE downto 0) :=
+        CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 100)
+        ADDI & "000000000001" & "11111" & "00000" &             -- ADDI X0, XZR, #1
+        
+        CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 010)
+        ADDI & "000000000111" & "11111" & "00001" &             -- ADDI X1, XZR, #7
+        
+        CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 001)
+        ADDI & "000000000011" & "11111" & "00001" &             -- ADDI X1, XZR, #3
+        ADDI & "000000000011" & "11111" & "00000"               -- ADDI X0, XZR, #3
+    ;
+    
     signal clk : std_logic := '0';
     signal input : std_logic_vector(INSTR_MEM_SIZE downto 0);
     
@@ -102,7 +115,8 @@ begin
     sim_proc: process
     begin
         --input(CODE1_SIZE downto 0) <= code1;
-        input(CODE2_SIZE downto 0) <= code2;
+        --input(CODE2_SIZE downto 0) <= code2;
+        input(CODE3_SIZE downto 0) <= code3;
         wait;
     end process;
 end Behavior;
