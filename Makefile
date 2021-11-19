@@ -11,7 +11,7 @@ SIMFILES	= test/cpu_tb.vhdl
 GHDL_CMD	= ghdl
 GHDL_FLAGS	= --ieee=synopsys --warn-no-vital-generic
 GHDL_WORKDIR = --workdir=sim --work=work
-GHDL_STOP	= --stop-time=250ns
+GHDL_STOP	= --stop-time=320ns
 
 # For visualization
 VIEW_CMD        = /usr/bin/gtkwave

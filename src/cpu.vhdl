@@ -1,16 +1,17 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
 
 entity CPU is
     port (
         clk    : in std_logic;
-        input  : in std_logic_vector(((32 * 21) - 1) downto 0)
+        input  : in std_logic_vector(((32 * 26) - 1) downto 0)
     );
 end CPU;
 
 architecture Behavior of CPU is
     -- The size of our instruction memory
-    constant INSTR_COUNT : integer := 21;
+    constant INSTR_COUNT : integer := 26;
     constant MEM_SIZE : integer := (32 * INSTR_COUNT) - 1;
     
     -- Declare the decoder component
@@ -29,7 +30,8 @@ architecture Behavior of CPU is
             Imm         : out std_logic_vector(11 downto 0);
             DT_address  : out std_logic_vector(8 downto 0);
             DT_op       : out std_logic_vector(1 downto 0);
-            BR_address  : out std_logic_vector(25 downto 0);
+            BR_address  : out std_logic_vector(21 downto 0);
+            BR_op       : out std_logic_vector(3 downto 0);
             CBR_address : out std_logic_vector(18 downto 0)
         );
     end component;
@@ -90,7 +92,9 @@ architecture Behavior of CPU is
     signal Imm, Imm2 : std_logic_vector(11 downto 0);
     signal DT_address, DT_address2 : std_logic_vector(8 downto 0);
     signal DT_op : std_logic_vector(1 downto 0);
-    signal BR_address : std_logic_vector(25 downto 0);
+    signal BR_address : std_logic_vector(21 downto 0);
+    signal BR_address2 : std_logic_vector(27 downto 0);
+    signal BR_op : std_logic_vector(3 downto 0);
     signal CBR_address : std_logic_vector(18 downto 0);
     
     -- Signals for the registers
@@ -113,8 +117,11 @@ architecture Behavior of CPU is
     signal RegWrite, RegWrite2, Reg2Loc : std_logic := '0';                -- 0 = no write, 1 = write
     signal MemWrite, MemWrite2 : std_logic := '0';
     signal MemRead, MemRead2 : std_logic := '0';
+    signal Br, Br2 : std_logic := '0';
     signal ALU_Op1 : std_logic_vector(3 downto 0);
     signal MemData : std_logic_vector(31 downto 0) := X"00000000";
+    
+    signal ID_stall : std_logic := '0';
 begin
     -- Map the decoder
     decode : Decoder port map (
@@ -132,6 +139,7 @@ begin
         DT_address => DT_address,
         DT_op => DT_op,
         BR_address => BR_address,
+        BR_op => BR_op,
         CBR_address => CBR_address
     );
     
@@ -174,15 +182,23 @@ begin
                 -- Instruction fetch
                 --if stage = 1 and done = '0' then
                 if stage = 1 then
-                    instr <= input((PC + 31) downto PC);
-                    if PC + 32 <= MEM_SIZE then
+                    --if ID_stall = '1' then
+                    --    PC <= ((to_integer(unsigned(BR_address2)) - 1) * 32) + PC;
+                    --    if PC + 32 > MEM_SIZE then
+                    --        done <= '1';
+                    --    end if;
+                    --elsif PC + 32 <= MEM_SIZE then
+                    if PC+32 <= MEM_SIZE then
                         PC <= PC + 32;
                     else
                         done <= '1';
                     end if;
+                    if done = '0' then
+                        instr <= input((PC + 31) downto PC);
+                    end if;
                     
                 -- Instruction decode
-                elsif stage = 2 then
+                elsif stage = 2 and ID_stall = '0' then
                     -- Zero out and/or set inputs
                     -- We will reset others as needed
                     sel_A <= Rn;
@@ -194,6 +210,7 @@ begin
                     Reg2Loc <= '0';
                     RegWrite <= '0';
                     srcShamt <= '0';
+                    Br <= '0';
                 
                     -- R-format instructons
                     case (R_opcode) is
@@ -288,6 +305,11 @@ begin
                     -- B format instructions
                     case (B_opcode) is
                         -- B
+                        when "000101" =>
+                            Br <= '1';
+                            BR_address2 <= "00" & BR_address & BR_op;
+                            ID_stall <= '1';
+                            PC <= ((to_integer(unsigned(BR_address2)) + 2) * 32) + PC;
                         
                         -- BR
                         
@@ -306,6 +328,10 @@ begin
                     end case; -- case D_opcode
                     end case; -- case I_opcode
                     end case; -- case R_opcode
+                   
+                -- Stall the decoder for branches 
+                elsif stage = 2 and ID_stall = '1' then
+                    ID_stall <= '0';
                 
                 -- Instruction execute
                 elsif stage = 3 then
@@ -314,6 +340,7 @@ begin
                     MemWrite2 <= MemWrite;
                     MemRead2 <= MemRead;
                     MemData <= O_dataB;
+                    Br2 <= Br;
                     
                     if Reg2Loc = '1' then
                         I_dataD <= O_dataA;

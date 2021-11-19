@@ -5,7 +5,7 @@ entity cpu_tb is
 end cpu_tb;
 
 architecture Behavior of cpu_tb is
-    constant INSTR_COUNT : integer := 21;
+    constant INSTR_COUNT : integer := 26;
     constant MEM_SIZE : integer := (32 * INSTR_COUNT) - 1;
 
     -- The CPU
@@ -29,10 +29,15 @@ architecture Behavior of cpu_tb is
     constant STUR : std_logic_vector := "11111000000";
     constant LDUR : std_logic_vector := "11111000010";
     constant CMP : std_logic_vector := "10110101";
+    constant B : std_logic_vector := "000101";
     
     signal clk : std_logic := '0';
     signal input : std_logic_vector(MEM_SIZE downto 0) :=
-          
+          ADDI & "000000000101" & "00100" & "00100" &             -- ADDI X0, X0, #5 (should NOT happen)
+          MOV & "11111" & "00010" &                               -- MOV X2, XZR (should happen)
+          MOV & "11111" & "00001" &                               -- MOV X1, XZR (should NOT happen)
+          ADDI & "000000000101" & "00000" & "00000" &             -- ADDI X0, X0, #5 (should NOT happen)
+          B & "0000000000000000000000" & "0100" &                 -- B <3> -> (3 * 32)
           LDUR & "000000000" & "00" & "00001" & "00110" &         -- LDUR X6, [X1, #0]    == MEM(0) = 10 (X6 == 10)
           ADDI & "000000000010" & "00101" & "00101" &             -- ADDI X5, X5, #2  == 12
           R_OR & "00000" & "000000" & "00001" & "00100" &         --  OR X4, X0, X1 == 6 (STALL CYCLE)

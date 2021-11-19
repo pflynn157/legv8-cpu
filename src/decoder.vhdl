@@ -17,7 +17,8 @@ entity Decoder is
         Imm         : out std_logic_vector(11 downto 0);
         DT_address  : out std_logic_vector(8 downto 0);
         DT_op       : out std_logic_vector(1 downto 0);
-        BR_address  : out std_logic_vector(25 downto 0);
+        BR_address  : out std_logic_vector(21 downto 0);
+        BR_op       : out std_logic_vector(3 downto 0);
         CBR_address : out std_logic_vector(18 downto 0)
     );
 end Decoder;
@@ -44,7 +45,8 @@ begin
         
         -- Decode B-type instructions
         B_opcode <= instr(31 downto 26);
-        BR_address <= instr(25 downto 0);
+        BR_address <= instr(25 downto 4);
+        BR_op <= instr(3 downto 0);
             
         -- Decode CB-type instructions
         CB_opcode <= instr(31 downto 24);
