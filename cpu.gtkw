@@ -1,21 +1,21 @@
 [*]
-[*] GTKWave Analyzer v3.3.108 (w)1999-2020 BSI
-[*] Thu Nov 18 23:32:04 2021
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Fri Nov 19 12:11:05 2021
 [*]
-[dumpfile] "/home/patrick/Projects/legv8_cpu/sim/wave_cpu.ghw"
-[dumpfile_mtime] "Thu Nov 18 23:31:57 2021"
-[dumpfile_size] 132161
-[savefile] "/home/patrick/Projects/legv8_cpu/cpu.gtkw"
+[dumpfile] "/home/patrick/Projects_Github/legv8-cpu/sim/wave_cpu.ghw"
+[dumpfile_mtime] "Fri Nov 19 12:10:48 2021"
+[dumpfile_size] 144656
+[savefile] "/home/patrick/Projects_Github/legv8-cpu/cpu.gtkw"
 [timestart] 0
-[size] 1920 1033
+[size] 1920 1020
 [pos] -1 -1
-*-25.320427 220600000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-25.271122 255000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.cpu_tb.
 [treeopen] top.cpu_tb.uut.
 [treeopen] top.cpu_tb.uut.decode.
 [sst_width] 238
-[signals_width] 224
+[signals_width] 252
 [sst_expanded] 1
 [sst_vpaned_height] 350
 @28

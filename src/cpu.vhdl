@@ -5,13 +5,13 @@ use IEEE.numeric_std.all;
 entity CPU is
     port (
         clk    : in std_logic;
-        input  : in std_logic_vector(((32 * 26) - 1) downto 0)
+        input  : in std_logic_vector(((32 * 64) - 1) downto 0)
     );
 end CPU;
 
 architecture Behavior of CPU is
-    -- The size of our instruction memory
-    constant INSTR_COUNT : integer := 26;
+    -- The size of our instruction memory (2048)
+    constant INSTR_COUNT : integer := 64;
     constant MEM_SIZE : integer := (32 * INSTR_COUNT) - 1;
     
     -- Declare the decoder component
@@ -121,7 +121,7 @@ architecture Behavior of CPU is
     signal ALU_Op1 : std_logic_vector(3 downto 0);
     signal MemData : std_logic_vector(31 downto 0) := X"00000000";
     
-    signal ID_stall : std_logic := '0';
+    signal Stall : std_logic := '0';
 begin
     -- Map the decoder
     decode : Decoder port map (
@@ -182,12 +182,14 @@ begin
                 -- Instruction fetch
                 --if stage = 1 and done = '0' then
                 if stage = 1 then
-                    --if ID_stall = '1' then
-                    --    PC <= ((to_integer(unsigned(BR_address2)) - 1) * 32) + PC;
-                    --    if PC + 32 > MEM_SIZE then
-                    --        done <= '1';
-                    --    end if;
-                    --elsif PC + 32 <= MEM_SIZE then
+                --    if Br = '1' then
+                --        Br <= '0';
+                --        Stall <= '0';
+                --        --PC <= ((to_integer(unsigned(BR_address2)) - 2) * 32) + PC;
+                --        if PC + 32 > MEM_SIZE then
+                --            done <= '1';
+                --        end if;
+                --    elsif PC + 32 <= MEM_SIZE then
                     if PC+32 <= MEM_SIZE then
                         PC <= PC + 32;
                     else
@@ -198,7 +200,7 @@ begin
                     end if;
                     
                 -- Instruction decode
-                elsif stage = 2 and ID_stall = '0' then
+                elsif stage = 2 and Stall = '0' then
                     -- Zero out and/or set inputs
                     -- We will reset others as needed
                     sel_A <= Rn;
@@ -307,9 +309,12 @@ begin
                         -- B
                         when "000101" =>
                             Br <= '1';
-                            BR_address2 <= "00" & BR_address & BR_op;
-                            ID_stall <= '1';
-                            PC <= ((to_integer(unsigned(BR_address2)) + 2) * 32) + PC;
+                            if to_integer(signed(BR_address & BR_op)) > 0 then
+                                PC <= PC + ((to_integer(signed(BR_address & BR_op)) - 1) * 32);
+                            else
+                                PC <= (PC + (to_integer(signed(BR_address & BR_op))) * 32) - (32 * 1);
+                            end if;
+                            Stall <= '1';
                         
                         -- BR
                         
@@ -330,8 +335,8 @@ begin
                     end case; -- case R_opcode
                    
                 -- Stall the decoder for branches 
-                elsif stage = 2 and ID_stall = '1' then
-                    ID_stall <= '0';
+                elsif stage = 2 and Stall = '1' then
+                    Stall <= '0';
                 
                 -- Instruction execute
                 elsif stage = 3 then
@@ -340,7 +345,6 @@ begin
                     MemWrite2 <= MemWrite;
                     MemRead2 <= MemRead;
                     MemData <= O_dataB;
-                    Br2 <= Br;
                     
                     if Reg2Loc = '1' then
                         I_dataD <= O_dataA;
