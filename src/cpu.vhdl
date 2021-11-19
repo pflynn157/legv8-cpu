@@ -310,6 +310,52 @@ begin
                         
                         -- BR
                         when "010101" =>
+                            case (BR_op) is
+                                -- BEQ
+                                when "0000" =>
+                                    if flags(0) = '1' then
+                                        PC <= PC + ((to_integer(signed(BR_address)) - 1) * 32);
+                                        Stall <= '1';
+                                    end if;
+                                
+                                -- BNE
+                                when "0001" =>
+                                    if flags(0) = '0' then
+                                        PC <= PC + ((to_integer(signed(BR_address)) - 1) * 32);
+                                        Stall <= '1';
+                                    end if;
+                                
+                                -- BGT
+                                when "1100" =>
+                                    if flags(2) = '1' then
+                                        PC <= PC + ((to_integer(signed(BR_address)) - 1) * 32);
+                                        Stall <= '1';
+                                    end if;
+                                
+                                -- BGE
+                                when "1010" =>
+                                    if flags(2) = '1' or flags(0) = '1' then
+                                        PC <= PC + ((to_integer(signed(BR_address)) - 1) * 32);
+                                        Stall <= '1';
+                                    end if;
+                                
+                                -- BLT
+                                when "1011" =>
+                                    if flags(1) = '1' then
+                                        PC <= PC + ((to_integer(signed(BR_address)) - 1) * 32);
+                                        Stall <= '1';
+                                    end if;
+                                
+                                -- BLE
+                                when "1101" =>
+                                    if flags(1) = '1' or flags(0) = '1' then
+                                        PC <= PC + ((to_integer(signed(BR_address)) - 1) * 32);
+                                        Stall <= '1';
+                                    end if;
+                                
+                                -- TODO: The CPU should have a heart attack
+                                when others =>
+                            end case;
                         
                         when others =>
                     
@@ -398,7 +444,7 @@ begin
                         elsif signed(Result) > 0 then
                             Flags <= "100";
                         else
-                            Flags <= "111";
+                            Flags <= "001";
                         end if;
                     end if;
                 end if;

@@ -33,6 +33,15 @@ architecture Behavior of cpu_tb is
     constant LDUR : std_logic_vector := "11111000010";
     constant CMP : std_logic_vector := "10110101";
     constant B : std_logic_vector := "000101";
+    constant BC : std_logic_vector := "010101";    -- Conditional branch of any kind
+    
+    -- For the conditional branches
+    constant BEQ : std_logic_vector := "0000";
+    constant BNE : std_logic_vector := "0001";
+    constant BGT : std_logic_vector := "1100";
+    constant BGE : std_logic_vector := "1010";
+    constant BLT : std_logic_vector := "1011";
+    constant BLE : std_logic_vector := "1101";
     
     constant CODE1_SIZE : integer := 32 * 21 - 1;
     signal code1 : std_logic_vector(CODE1_SIZE downto 0) :=
@@ -84,11 +93,71 @@ architecture Behavior of cpu_tb is
         CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 100) 10 - 7 = 3
         NOP & "0000000000" &                                    -- NOP
         ADDI & "000000001010" & "11111" & "00000" &             -- ADDI X0, XZR, #10
-        
         CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 010) 3 - 7 = -4
         NOP & "0000000000" &                                    -- NOP
         ADDI & "000000000111" & "11111" & "00001" &             -- ADDI X1, XZR, #7
-        
+        CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 001) 3-3 = 0
+        NOP & "0000000000" &                                    -- NOP
+        ADDI & "000000000011" & "11111" & "00001" &             -- ADDI X1, XZR, #3
+        ADDI & "000000000011" & "11111" & "00000"               -- ADDI X0, XZR, #3
+    ;
+    
+    constant CODE4_SIZE : integer := 32 * 58 - 1;
+    signal code4 : std_logic_vector(CODE4_SIZE downto 0) :=
+        ADDI & "000000000010" & "00010" & "00010" &             -- ADDI X2, X2, #2 (should happen)              X2 = 13 (D)
+        ADDI & "000000000011" & "11111" & "00100" &             -- ADDI X4, XZR, #3 (should NOT happen)
+        ADDI & "000000000011" & "11111" & "00101" &             -- ADDI X5, XZR, #3 (should NOT happen)
+        BC & "0000000000000000000011" & BGT &                   -- BGE 3  (10 - 3 = 7) -> BRANCH 
+        NOP & "0000000000" &                                    -- NOP
+        NOP & "0000000000" &                                    -- NOP
+        CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 100) 10-3 = 7
+        NOP & "0000000000" &                                    -- NOP
+        ADDI & "000000001010" & "11111" & "00000" &             -- ADDI X0, XZR, #10
+        ADDI & "000000000010" & "00010" & "00010" &             -- ADDI X2, X2, #2 (should happen)              X2 = 11 (B)
+        ADDI & "000000000011" & "11111" & "00100" &             -- ADDI X4, XZR, #3 (should NOT happen)
+        ADDI & "000000000011" & "11111" & "00101" &             -- ADDI X5, XZR, #3 (should NOT happen)
+        BC & "0000000000000000000011" & BGE &                   -- BGE 3  (1 - 3 = -2) -> BRANCH 
+        NOP & "0000000000" &                                    -- NOP
+        NOP & "0000000000" &                                    -- NOP
+        CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 001) 3-3 = 0
+        ADDI & "000000000010" & "00010" & "00010" &             -- ADDI X2, X2, #2 (should happen)              X2 = 9
+        ADDI & "000000000011" & "11111" & "00100" &             -- ADDI X4, XZR, #3 (should NOT happen)
+        ADDI & "000000000011" & "11111" & "00101" &             -- ADDI X5, XZR, #3 (should NOT happen)
+        BC & "0000000000000000000011" & BLE &                   -- BLE 3  (3 - 3 = 0) -> BRANCH 
+        NOP & "0000000000" &                                    -- NOP
+        NOP & "0000000000" &                                    -- NOP
+        CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 001) 3-3 = 0
+        NOP & "0000000000" &                                    -- NOP
+        ADDI & "000000000011" & "11111" & "00000" &             -- ADDI X0, XZR, #3
+        ADDI & "000000000010" & "00010" & "00010" &             -- ADDI X2, X2, #2 (should happen)              X2 = 7
+        ADDI & "000000000011" & "11111" & "00100" &             -- ADDI X4, XZR, #3 (should NOT happen)
+        ADDI & "000000000011" & "11111" & "00101" &             -- ADDI X5, XZR, #3 (should NOT happen)
+        BC & "0000000000000000000011" & BLE &                   -- BLE 3  (1 - 3 = -2) -> BRANCH 
+        NOP & "0000000000" &                                    -- NOP
+        NOP & "0000000000" &                                    -- NOP
+        CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 001) 1-3 = -2
+        ADDI & "000000000010" & "00010" & "00010" &             -- ADDI X2, X2, #2 (should happen)               X2 = 5
+        ADDI & "000000000011" & "11111" & "00100" &             -- ADDI X4, XZR, #3 (should NOT happen)
+        ADDI & "000000000011" & "11111" & "00101" &             -- ADDI X5, XZR, #3 (should NOT happen)
+        BC & "0000000000000000000011" & BLT &                   -- BLT 3
+        NOP & "0000000000" &                                    -- NOP
+        NOP & "0000000000" &                                    -- NOP
+        CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 001) 1-3 = -2
+        ADDI & "000000000010" & "00010" & "00010" &             -- ADDI X2, X2, #2 (should happen)               X2 = 3
+        ADDI & "000000000010" & "11111" & "00100" &             -- ADDI X4, XZR, #2 (should NOT happen)
+        ADDI & "000000000010" & "11111" & "00101" &             -- ADDI X5, XZR, #2 (should NOT happen)
+        BC & "0000000000000000000011" & BNE &                   -- BNE 3
+        NOP & "0000000000" &                                    -- NOP
+        NOP & "0000000000" &                                    -- NOP
+        CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 001) 1-3 = -2
+        NOP & "0000000000" &                                    -- NOP
+        ADDI & "000000000001" & "11111" & "00000" &             -- ADDI X0, XZR, #1
+        ADDI & "000000000001" & "00010" & "00010" &             -- ADDI X2, X2, #1 (should happen)                X2 = 1
+        ADDI & "000000000001" & "11111" & "00100" &             -- ADDI X4, XZR, #1 (should NOT happen)
+        ADDI & "000000000001" & "11111" & "00101" &             -- ADDI X5, XZR, #1 (should NOT happen)
+        BC & "0000000000000000000011" & BEQ &                   -- BEQ 3
+        NOP & "0000000000" &                                    -- NOP
+        NOP & "0000000000" &                                    -- NOP
         CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 001) 3-3 = 0
         NOP & "0000000000" &                                    -- NOP
         ADDI & "000000000011" & "11111" & "00001" &             -- ADDI X1, XZR, #3
@@ -120,7 +189,8 @@ begin
     begin
         --input(CODE1_SIZE downto 0) <= code1;
         --input(CODE2_SIZE downto 0) <= code2;
-        input(CODE3_SIZE downto 0) <= code3;
+        --input(CODE3_SIZE downto 0) <= code3;
+        input(CODE4_SIZE downto 0) <= code4;
         wait;
     end process;
 end Behavior;
