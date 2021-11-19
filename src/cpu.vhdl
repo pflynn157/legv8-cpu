@@ -93,7 +93,6 @@ architecture Behavior of CPU is
     signal DT_address, DT_address2 : std_logic_vector(8 downto 0);
     signal DT_op : std_logic_vector(1 downto 0);
     signal BR_address : std_logic_vector(21 downto 0);
-    signal BR_address2 : std_logic_vector(27 downto 0);
     signal BR_op : std_logic_vector(3 downto 0);
     signal CBR_address : std_logic_vector(18 downto 0);
     
@@ -117,7 +116,6 @@ architecture Behavior of CPU is
     signal RegWrite, RegWrite2, Reg2Loc : std_logic := '0';                -- 0 = no write, 1 = write
     signal MemWrite, MemWrite2 : std_logic := '0';
     signal MemRead, MemRead2 : std_logic := '0';
-    signal Br, Br2 : std_logic := '0';
     signal ALU_Op1 : std_logic_vector(3 downto 0);
     signal MemData : std_logic_vector(31 downto 0) := X"00000000";
     
@@ -180,16 +178,7 @@ begin
             -- Instruction fetch
             for stage in 1 to 5 loop
                 -- Instruction fetch
-                --if stage = 1 and done = '0' then
                 if stage = 1 then
-                --    if Br = '1' then
-                --        Br <= '0';
-                --        Stall <= '0';
-                --        --PC <= ((to_integer(unsigned(BR_address2)) - 2) * 32) + PC;
-                --        if PC + 32 > MEM_SIZE then
-                --            done <= '1';
-                --        end if;
-                --    elsif PC + 32 <= MEM_SIZE then
                     if PC+32 <= MEM_SIZE then
                         PC <= PC + 32;
                     else
@@ -212,7 +201,6 @@ begin
                     Reg2Loc <= '0';
                     RegWrite <= '0';
                     srcShamt <= '0';
-                    Br <= '0';
                 
                     -- R-format instructons
                     case (R_opcode) is
@@ -308,15 +296,11 @@ begin
                     case (B_opcode) is
                         -- B
                         when "000101" =>
-                            Br <= '1';
-                            if to_integer(signed(BR_address & BR_op)) > 0 then
-                                PC <= PC + ((to_integer(signed(BR_address & BR_op)) - 1) * 32);
-                            else
-                                PC <= (PC + (to_integer(signed(BR_address & BR_op))) * 32) - (32 * 1);
-                            end if;
+                            PC <= PC + ((to_integer(signed(BR_address & BR_op)) - 1) * 32);
                             Stall <= '1';
                         
                         -- BR
+                        when "010101" =>
                         
                         when others =>
                     
