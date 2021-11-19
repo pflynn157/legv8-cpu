@@ -1,33 +1,33 @@
 [*]
-[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Fri Nov 19 12:11:05 2021
+[*] GTKWave Analyzer v3.3.108 (w)1999-2020 BSI
+[*] Fri Nov 19 20:09:23 2021
 [*]
-[dumpfile] "/home/patrick/Projects_Github/legv8-cpu/sim/wave_cpu.ghw"
-[dumpfile_mtime] "Fri Nov 19 12:10:48 2021"
-[dumpfile_size] 144656
-[savefile] "/home/patrick/Projects_Github/legv8-cpu/cpu.gtkw"
+[dumpfile] "/home/patrick/Projects/legv8_cpu/sim/wave_cpu.ghw"
+[dumpfile_mtime] "Fri Nov 19 20:09:17 2021"
+[dumpfile_size] 143729
+[savefile] "/home/patrick/Projects/legv8_cpu/cpu.gtkw"
 [timestart] 0
-[size] 1920 1020
+[size] 1920 1033
 [pos] -1 -1
 *-25.271122 255000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.cpu_tb.
 [treeopen] top.cpu_tb.uut.
-[treeopen] top.cpu_tb.uut.decode.
 [sst_width] 238
 [signals_width] 252
 [sst_expanded] 1
-[sst_vpaned_height] 350
+[sst_vpaned_height] 365
 @28
 top.cpu_tb.clk
 @420
 top.cpu_tb.uut.pc
 @28
 top.cpu_tb.uut.srcb
-top.cpu_tb.uut.br
-top.cpu_tb.uut.br2
-@23
-#{top.cpu_tb.uut.br_address2[23:0]} top.cpu_tb.uut.br_address2[23] top.cpu_tb.uut.br_address2[22] top.cpu_tb.uut.br_address2[21] top.cpu_tb.uut.br_address2[20] top.cpu_tb.uut.br_address2[19] top.cpu_tb.uut.br_address2[18] top.cpu_tb.uut.br_address2[17] top.cpu_tb.uut.br_address2[16] top.cpu_tb.uut.br_address2[15] top.cpu_tb.uut.br_address2[14] top.cpu_tb.uut.br_address2[13] top.cpu_tb.uut.br_address2[12] top.cpu_tb.uut.br_address2[11] top.cpu_tb.uut.br_address2[10] top.cpu_tb.uut.br_address2[9] top.cpu_tb.uut.br_address2[8] top.cpu_tb.uut.br_address2[7] top.cpu_tb.uut.br_address2[6] top.cpu_tb.uut.br_address2[5] top.cpu_tb.uut.br_address2[4] top.cpu_tb.uut.br_address2[3] top.cpu_tb.uut.br_address2[2] top.cpu_tb.uut.br_address2[1] top.cpu_tb.uut.br_address2[0]
+top.cpu_tb.uut.setflags
+@29
+top.cpu_tb.uut.setflags2
+@28
+#{top.cpu_tb.uut.flags[2:0]} top.cpu_tb.uut.flags[2] top.cpu_tb.uut.flags[1] top.cpu_tb.uut.flags[0]
 @200
 -
 @22

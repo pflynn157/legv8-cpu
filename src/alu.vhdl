@@ -37,13 +37,13 @@ begin
             
             -- Sub
             when "0110" =>
-                Rs1 <= std_logic_vector(signed(A) - signed(B));
-                if Rs1 = X"00000000" then
-                    Zero <= '1';
-                else
-                    Zero <= '0';
-                end if;
-                Result <= Rs1;
+                Result <= std_logic_vector(signed(A) - signed(B));
+               -- if Rs1 = X"00000000" then
+                --    Zero <= '1';
+                --else
+                --    Zero <= '0';
+                --end if;
+                --Result <= Rs1;
             
             -- Set on less than
             when "0111" =>

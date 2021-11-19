@@ -102,7 +102,7 @@ architecture Behavior of CPU is
     signal I_enD : std_logic := '0';
     
     -- Signals for the ALU
-    signal A, B, Result, Result2 : std_logic_vector(31 downto 0);
+    signal A, B, Result : std_logic_vector(31 downto 0);
     signal ALU_Op : std_logic_vector(3 downto 0);
     signal Zero : std_logic;
     
@@ -371,7 +371,6 @@ begin
                 
                 -- Register write_back
                 elsif stage = 5 then
-                    
                     -- Write to the registers
                     if RegWrite2 = '1' then
                         if Reg2Loc = '0' then
@@ -387,6 +386,16 @@ begin
                         I_enD <= '0';
                     end if;
                     
+                    -- Write the flags registers
+                    if SetFlags2 = '1' then
+                        if signed(Result) < 0 then
+                            Flags <= "010";
+                        elsif signed(Result) > 0 then
+                            Flags <= "100";
+                        else
+                            Flags <= "111";
+                        end if;
+                    end if;
                 end if;
             end loop;
         end if;
