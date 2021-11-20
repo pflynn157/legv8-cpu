@@ -164,6 +164,33 @@ architecture Behavior of cpu_tb is
         ADDI & "000000000011" & "11111" & "00000"               -- ADDI X0, XZR, #3
     ;
     
+    -- Equivalent C code
+    -- int n = 0;
+    -- for (int i = 0; i<10; i++) {
+    --    n += i;
+    -- }
+    constant CODE5_SIZE : integer := 32 * 18 - 1;
+    signal code5 : std_logic_vector(CODE5_SIZE downto 0) :=
+        NOP & "0000000000" &                                    -- NOP
+        NOP & "0000000000" &                                    -- NOP
+        ADDI & "000000000000" & "11111" & "00001" &             -- ADDI X1, XZR, #0
+        B & "1111111111111111111111" & "0111"     &             -- B -9
+        ADDI & "000000000001" & "00001" & "00001" &             -- ADDI X1 X1, #1
+        STUR & "000000000" & "00" & "11111" & "00011" &         -- STUR X3, [XZR, #0]    == MEM(0)
+        NOP & "0000000000" &                                    -- NOP
+        ADD & "00000" & "000011" & "00001" & "00011" &          -- ADD X3, X3, X1
+        LDUR & "000000000" & "00" & "11111" & "00011" &         -- LDUR X3, [XZR, #0]    == MEM(0)
+        BC & "0000000000000000000111" & BGE &                   -- BGE 7
+        NOP & "0000000000" &                                    -- NOP
+        NOP & "0000000000" &                                    -- NOP 
+        CMP & "00" & "000000000000" & "00001" & "00010" &       -- CMP X1, X2
+        NOP & "0000000000" &                                    -- NOP
+        ADDI & "000000001010" & "11111" & "00010" &             -- ADDI X2, XZR, #10
+        MOV & "11111" & "00010" &                               -- MOV X1, XZR          X1 == i = 0
+        STUR & "000000000" & "00" & "11111" & "00000" &         -- STUR X0, [XZR, #0]    == MEM(0) = 0
+        MOV & "11111" & "00000"                                 -- MOV X0, XZR
+    ;
+    
     signal clk : std_logic := '0';
     signal input : std_logic_vector(INSTR_MEM_SIZE downto 0);
     
@@ -190,7 +217,8 @@ begin
         --input(CODE1_SIZE downto 0) <= code1;
         --input(CODE2_SIZE downto 0) <= code2;
         --input(CODE3_SIZE downto 0) <= code3;
-        input(CODE4_SIZE downto 0) <= code4;
+        --input(CODE4_SIZE downto 0) <= code4;
+        input(CODE5_SIZE downto 0) <= code5;
         wait;
     end process;
 end Behavior;
