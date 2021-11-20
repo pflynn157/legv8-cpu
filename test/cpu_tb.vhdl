@@ -47,7 +47,7 @@ architecture Behavior of cpu_tb is
     signal code1 : std_logic_vector(CODE1_SIZE downto 0) :=
           LDUR & "000000000" & "00" & "00001" & "00110" &         -- LDUR X6, [X1, #0]    == MEM(0) = 10 (X6 == 10)
           ADDI & "000000000010" & "00101" & "00101" &             -- ADDI X5, X5, #2  == 12
-          R_OR & "00000" & "000000" & "00001" & "00100" &         --  OR X4, X0, X1 == 6 (STALL CYCLE)
+          NOP & "0000000000" &                                    -- NOP
           LDUR & "000000011" & "00" & "11111" & "00101" &         -- LDUR X5, [XZR, #3]    == MEM(3) = 10 (X5 == 10)
           STUR & "000000011" & "00" & "11111" & "00010" &         -- STUR X2, [XZR, #3]    == MEM(3) = 10
           STUR & "000000000" & "00" & "00001" & "00010" &         -- STUR X2, [X1, #0]     == MEM(0) = 10
@@ -65,7 +65,7 @@ architecture Behavior of cpu_tb is
           ADDI & "000000000100" & "00000" & "00000" &             -- ADDI X0, X0, #4 
           MOV & "11111" & "00010" &                               -- MOV X2, XZR
           MOV & "11111" & "00001" &                               -- MOV X1, XZR
-          MOV & "11111" & "00000"                                 -- MOV X0, XZR     
+          MOV & "11111" & "00000"                                 -- MOV X0, XZR 
     ;
     
     constant CODE2_SIZE : integer := 32 * 11 - 1;
