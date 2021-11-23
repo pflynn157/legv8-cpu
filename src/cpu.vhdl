@@ -356,9 +356,11 @@ begin
                     --elsif opcode = "0000011" then
                     --elsif opcode = "0000000" then
                     --else
-                        --if rd = sel_A or rd = sel_B then
-                        --    IF_stall <= '1';
-                        --end if;
+                        if not is_X(sel_D) then
+                        if sel_D = sel_A or sel_D = sel_B then
+                            IF_stall <= '1';
+                        end if;
+                        end if;
                     --end if;
                 elsif stage = 2 and IF_stall = '1' then
                     IF_stall <= '0';

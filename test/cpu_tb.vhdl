@@ -68,11 +68,12 @@ architecture Behavior of cpu_tb is
     constant BC : std_logic_vector := "010101";    -- Conditional branch of any kind
     
     -- Our test program
-    constant SIZE : integer := 2;
+    constant SIZE : integer := 3;
     type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
     signal rom_memory : instr_memory := (
         ADDI & "000000000010" & "00001" & "00001",            -- ADDI X1, X1, #2 
-        ADDI & "000000000100" & "00000" & "00000"             -- ADDI X0, X0, #4 
+        ADDI & "000000000100" & "00000" & "00000",            -- ADDI X0, X0, #4
+        ADDI & "000000000101" & "00000" & "00000"             -- ADDI X0, X0, #5    (X0 == 9)
     );
 begin
     uut : CPU port map (
