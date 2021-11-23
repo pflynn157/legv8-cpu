@@ -235,7 +235,14 @@ begin
                     -- D format instructions
                     case (D_opcode) is
                         -- LDUR
-                        --when "11111000010" =>
+                        when "11111000010" =>
+                            ALU_Op1 <= "0010";
+                            srcImm <= '1';
+                            MemRead <= '1';
+                            WB_Stall <= 2;
+                            IF_stall <= '1';
+                            RegWrite <= '1';
+                            Imm_S2 <= "000" & DT_Address;
                         --    ALU_Op <= "0010";
                         --    MemRead <= '1';
                         --    srcAddr <= '1';
