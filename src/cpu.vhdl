@@ -75,7 +75,7 @@ architecture Behavior of CPU is
     signal Rm, Rn, Rd : std_logic_vector(4 downto 0);
     signal shamt : std_logic_vector(5 downto 0);
     signal Imm : std_logic_vector(11 downto 0);
-    signal DT_address, DT_address2 : std_logic_vector(8 downto 0);
+    signal DT_address : std_logic_vector(8 downto 0);
     signal DT_op : std_logic_vector(1 downto 0);
     signal BR_address : std_logic_vector(21 downto 0);
     signal BR_op : std_logic_vector(3 downto 0);
@@ -172,7 +172,6 @@ begin
                     MemWrite <= '0';
                     Mem_Stall <= '0';
                     MemRead <= '0';
-                    
                     Imm_S2 <= Imm;
                     
                     -- R-format instructons
@@ -244,13 +243,13 @@ begin
                         --    RegWrite <= '1';
                         
                         -- STUR
-                        --when "11111000000" =>
-                        --    ALU_Op <= "0010";
-                        --    MemWrite <= '1';
-                        --    srcAddr <= '1';
-                        --    DT_Address2 <= DT_Address;
-                        --    sel_B <= Rd;
-                            
+                        when "11111000000" =>
+                            ALU_Op1 <= "0010";
+                            sel_B <= Rd;
+                            srcImm <= '1';
+                            MemWrite <= '1';
+                            Mem_Stall <= '1';
+                            Imm_S2 <= "000" & DT_Address;
                         
                         -- MOV
                         when "11010010100" =>
@@ -385,7 +384,7 @@ begin
                     O_Mem_Write <= MemWrite2;
                     O_Mem_Read <= MemRead2;
                     O_Mem_Address <= Result;
-                    O_Data_Len <= Data_Len2;
+                    O_Data_Len <= "11";
                     
                     if MemWrite2 = '1' then
                         O_Mem_Data <= MemData;

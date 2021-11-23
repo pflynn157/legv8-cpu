@@ -29,6 +29,12 @@ begin
                 I_address := std_logic_vector(unsigned(address) + i);
                 block_indices(i) := to_integer(unsigned(I_address(31 downto 4)));
                 word_indices(i) := to_integer(unsigned(I_address(3 downto 0)));
+                
+                -- This is crude, but it does give some added protection
+                if block_indices(i) >= 4096 or word_indices(i) >= 16 then
+                    block_indices(i) := 0;
+                    word_indices(i) := 0;
+                end if;
             end if;
         end loop;
         

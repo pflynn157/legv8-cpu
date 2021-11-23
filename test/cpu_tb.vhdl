@@ -68,14 +68,14 @@ architecture Behavior of cpu_tb is
     constant BC : std_logic_vector := "010101";    -- Conditional branch of any kind
     
     -- Our test program
-    constant SIZE : integer := 15;
+    constant SIZE : integer := 17;
     type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
     signal rom_memory : instr_memory := (
         MOV & "11111" & "00000",                               -- MOV X0, XZR  
         MOV & "11111" & "00001",                               -- MOV X1, XZR
         MOV & "11111" & "00010",                               -- MOV X2, XZR
         ADDI & "000000000100" & "00000" & "00000",             -- ADDI X0, X0, #4    (X0 == 4)
-        ADDI & "000000000010" & "00001" & "00001",             -- ADDI X1, X1, #2    (X1 == 2)
+        ADDI & "000000010000" & "00001" & "00001",             -- ADDI X1, X1, #2    (X1 == 16)
         ADDI & "000000001010" & "00010" & "00010",             -- ADDI X2, X2, #10   (X2 == 10)
         ADDI & "000000001010" & "11111" & "00011",             -- ADDI X3, XZR, #10   (X3 == 10)
         ADD & "00000" & "000000" & "00001" & "00100",          -- ADD X4, X0, X1      (X4 == 6)
@@ -85,15 +85,17 @@ architecture Behavior of cpu_tb is
         R_LSL & "00000" & "000010" & "00000" & "00100",        -- LSL X4, X0, #2       (X4 == 16)
         R_LSR & "00000" & "000010" & "00000" & "00100",        -- LSR X4, X0, #2       (X4 == 1)
         ADDI & "000000000101" & "00010" & "00100",             -- ADDI X4, X2, #5      (X4 == 15)
-        SUBI & "000000000101" & "00010" & "00100"             -- SUBI X4, X2, #5      (X4 == 5)
+        SUBI & "000000000101" & "00010" & "00100",             -- SUBI X4, X2, #5      (X4 == 5)
+        STUR & "000000000" & "00" & "00001" & "00010",         -- STUR X2, [X1, #0]     MEM(0x10) = 10
+        STUR & "000000011" & "00" & "11111" & "00010"         -- STUR X2, [XZR, #3]    MEM(0x03) = 10
     );
     
           --LDUR & "000000000" & "00" & "00001" & "00110" &         -- LDUR X6, [X1, #0]    == MEM(0) = 10 (X6 == 10)
           --ADDI & "000000000010" & "00101" & "00101" &             -- ADDI X5, X5, #2  == 12
           --NOP & "0000000000" &                                    -- NOP
           --LDUR & "000000011" & "00" & "11111" & "00101" &         -- LDUR X5, [XZR, #3]    == MEM(3) = 10 (X5 == 10)
-          --STUR & "000000011" & "00" & "11111" & "00010" &         -- STUR X2, [XZR, #3]    == MEM(3) = 10
-          --STUR & "000000000" & "00" & "00001" & "00010" &         -- STUR X2, [X1, #0]     == MEM(0) = 10
+          --
+          --
           --
           --
           --
