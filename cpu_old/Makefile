@@ -1,10 +1,9 @@
 # The files
-FILES		= src/alu.vhdl \
-                src/cpu.vhdl \
-                src/decoder.vhdl \
-                src/instr_memory.vhdl \
-                src/memory.vhdl \
-                src/registers.vhdl
+FILES		= src/registers.vhdl \
+              src/decoder.vhdl \
+              src/alu.vhdl \
+              src/cpu.vhdl \
+              src/memory.vhdl
 SIMDIR		= sim
 SIMFILES	= test/cpu_tb.vhdl
 
@@ -12,7 +11,7 @@ SIMFILES	= test/cpu_tb.vhdl
 GHDL_CMD	= ghdl
 GHDL_FLAGS	= --ieee=synopsys --warn-no-vital-generic
 GHDL_WORKDIR = --workdir=sim --work=work
-GHDL_STOP	= --stop-time=500ns
+GHDL_STOP	= --stop-time=1400ns
 
 # For visualization
 VIEW_CMD        = /usr/bin/gtkwave
