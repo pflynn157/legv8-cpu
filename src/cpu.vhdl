@@ -95,6 +95,7 @@ architecture Behavior of CPU is
     -- Intermediate signals for the pipeline
     signal sel_D_1, sel_D_2 : std_logic_vector(4 downto 0);
     signal srcImm, RegWrite, RegWrite2, MemWrite, MemWrite2 : std_logic := '0';
+    signal Reg2Loc, Reg2Loc2 : std_logic := '0';
     signal MemRead, MemRead2 : std_logic := '0';
     signal Imm_S2 : std_logic_vector(11 downto 0);
     signal MemData : std_logic_vector(31 downto 0);
@@ -168,6 +169,7 @@ begin
                     sel_B <= Rm;
                     srcImm <= '0';
                     RegWrite <= '0';
+                    Reg2Loc <= '0';
                     MemWrite <= '0';
                     Mem_Stall <= '0';
                     MemRead <= '0';
@@ -264,9 +266,10 @@ begin
                             
                         
                         -- MOV
-                        --when "11010010100" =>
-                        --    RegWrite <= '1';
-                        --    Reg2Loc <= '1';
+                        when "11010010100" =>
+                            ALU_Op <= "000";
+                            RegWrite <= '1';
+                            Reg2Loc <= '1';
                             
                         -- NOP
                         -- I doubt this is the actual NOP for Arm; I just made something
@@ -377,6 +380,9 @@ begin
                     A <= O_dataA;
                     if srcImm = '1' then
                         B <= "00000000000000000000" & Imm_S2;
+                    elsif Reg2Loc = '1' then
+                        A <= O_dataA;
+                        B <= X"00000000";
                     else
                         B <= O_dataB;
                     end if;
