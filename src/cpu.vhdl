@@ -150,6 +150,7 @@ begin
     );
 
     process (clk)
+        variable type_I : boolean := false;
     begin
         if rising_edge(clk) then
             if reset = '1' then
@@ -235,6 +236,7 @@ begin
                             --ALU_Op <= "0010";
                             ALU_Op <= "000";
                             RegWrite <= '1';
+                            type_I := true;
                             
                         -- SUBI
                         when "1101000100" =>
@@ -355,15 +357,20 @@ begin
                     end case; -- case R_opcode
                     
                     -- Check to see if we have a RAW dependency. If so, stall the pipeline
+                    if type_I then
+                        if rn = sel_d_1 then
+                            IF_stall <= '1';
+                        end if;
+                    end if;
                     --if opcode = "0100011" then
                     --elsif opcode = "0000011" then
                     --elsif opcode = "0000000" then
                     --else
-                        if not is_X(sel_D) then
-                        if sel_D = sel_A or sel_D = sel_B then
-                            IF_stall <= '1';
-                        end if;
-                        end if;
+                        --if not is_X(sel_D) then
+                        --if sel_D_1 = sel_A or sel_D_1 = sel_B then
+                        --    IF_stall <= '1';
+                        --end if;
+                        --end if;
                     --end if;
                 elsif stage = 2 and IF_stall = '1' then
                     IF_stall <= '0';
