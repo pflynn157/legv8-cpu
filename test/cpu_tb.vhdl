@@ -68,14 +68,15 @@ architecture Behavior of cpu_tb is
     constant BC : std_logic_vector := "010101";    -- Conditional branch of any kind
     
     -- Our test program
-    constant SIZE : integer := 21;
+    constant SIZE : integer := 22;
     type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
     signal rom_memory : instr_memory := (
         MOV & "11111" & "00000",                               -- MOV X0, XZR  
         MOV & "11111" & "00001",                               -- MOV X1, XZR
         MOV & "11111" & "00010",                               -- MOV X2, XZR
         ADDI & "000000000100" & "00000" & "00000",             -- ADDI X0, X0, #4    (X0 == 4)
-        ADDI & "000000010000" & "00001" & "00001",             -- ADDI X1, X1, #2    (X1 == 16)
+        ADDI & "000000000010" & "00001" & "00001",             -- ADDI X1, X1, #2    (X1 == 2)
+        ADDI & "000000010000" & "00111" & "00111",             -- ADDI X7, X7, #2    (X7 == 16)
         ADDI & "000000001010" & "00010" & "00010",             -- ADDI X2, X2, #10   (X2 == 10)
         ADDI & "000000001011" & "11111" & "00011",             -- ADDI X3, XZR, #11   (X3 == 11)
         ADD & "00000" & "000000" & "00001" & "00100",          -- ADD X4, X0, X1      (X4 == 6)
@@ -86,12 +87,12 @@ architecture Behavior of cpu_tb is
         R_LSR & "00000" & "000010" & "00000" & "00100",        -- LSR X4, X0, #2       (X4 == 1)
         ADDI & "000000000101" & "00010" & "00100",             -- ADDI X4, X2, #5      (X4 == 15)
         SUBI & "000000000101" & "00010" & "00100",             -- SUBI X4, X2, #5      (X4 == 5)
-        STUR & "000000000" & "00" & "00001" & "00011",         -- STUR X3, [X1, #0]     MEM(0x10) = 11
+        STUR & "000000000" & "00" & "00111" & "00011",         -- STUR X3, [X7, #0]     MEM(0x10) = 11
         STUR & "000000011" & "00" & "11111" & "00010",         -- STUR X2, [XZR, #3]    MEM(0x03) = 10
-        LDUR & "000000000" & "00" & "00001" & "00110",         -- LDUR X6, [X1, #0]     (X6 == 11)
-        NOP & "0000000000",                                    -- NOP
+        LDUR & "000000000" & "00" & "00111" & "00110",         -- LDUR X6, [X7, #0]     (X6 == 11)
         LDUR & "000000011" & "00" & "11111" & "00101",         -- LDUR X5, [XZR, #3]     (X5 == 10)
-        ADDI & "000000000010" & "00101" & "00101"              -- ADDI X5, X5, #2        (X5 == 12)
+        ADDI & "000000000010" & "00101" & "00101",             -- ADDI X5, X5, #2        (X5 == 12)
+        NOP & "0000000000"
     ); 
     
     --signal rom_memory : instr_memory := (
@@ -142,12 +143,12 @@ begin
             if to_integer(unsigned(O_PC)) < SIZE then
                 I_instr <= rom_memory(to_integer(unsigned(O_PC)));
                 wait until O_PC'event;
-            else
-                Reset <= '1';
+            --else
+             --   Reset <= '1';
             end if;
         end loop;
         
-        I_instr <= X"00000000";
+        I_instr <= rom_memory(SIZE - 1);
         Reset <= '1';
         wait;
     end process;

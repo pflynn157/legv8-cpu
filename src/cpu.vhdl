@@ -150,6 +150,7 @@ begin
     process (clk)
         variable type_I : boolean := false;
     begin
+        type_I := false;
         if rising_edge(clk) then
             if reset = '1' then
                 O_Mem_Write <= '0';
@@ -160,6 +161,8 @@ begin
                 if stage = 1 and IF_stall = '0' then
                     PC <= std_logic_vector(unsigned(PC) + 1);
                     instr <= I_instr;
+                elsif stage = 1 and IF_stall = '1' then
+                    PC <= std_logic_vector(unsigned(PC) - 1);
                     
                 -- Instruction decode
                 elsif stage = 2 and IF_stall = '0' then
@@ -243,11 +246,7 @@ begin
                             IF_stall <= '1';
                             RegWrite <= '1';
                             Imm_S2 <= "000" & DT_Address;
-                        --    ALU_Op <= "0010";
-                        --    MemRead <= '1';
-                        --    srcAddr <= '1';
-                        --    DT_Address2 <= DT_Address;
-                        --    RegWrite <= '1';
+                            type_I := true;
                         
                         -- STUR
                         when "11111000000" =>
