@@ -1,25 +1,27 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Tue Nov 23 17:37:05 2021
+[*] Tue Nov 23 17:45:35 2021
 [*]
 [dumpfile] "/home/patrick/Projects_Github/legv8-cpu/sim/wave_cpu.ghw"
-[dumpfile_mtime] "Tue Nov 23 17:26:20 2021"
-[dumpfile_size] 2093370
+[dumpfile_mtime] "Tue Nov 23 17:44:49 2021"
+[dumpfile_size] 2093385
 [savefile] "/home/patrick/Projects_Github/legv8-cpu/cpu.gtkw"
 [timestart] 0
 [size] 1920 1019
-[pos] -451 -220
-*-24.693760 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] -1 -1
+*-24.693760 65000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.cpu_tb.
 [treeopen] top.cpu_tb.mem_uut.mem.[2].
 [sst_width] 241
-[signals_width] 158
+[signals_width] 245
 [sst_expanded] 1
 [sst_vpaned_height] 295
 @28
 top.cpu_tb.clk
 top.cpu_tb.reset
+@29
+top.cpu_tb.uut.if_stall
 @22
 #{top.cpu_tb.i_instr[31:0]} top.cpu_tb.i_instr[31] top.cpu_tb.i_instr[30] top.cpu_tb.i_instr[29] top.cpu_tb.i_instr[28] top.cpu_tb.i_instr[27] top.cpu_tb.i_instr[26] top.cpu_tb.i_instr[25] top.cpu_tb.i_instr[24] top.cpu_tb.i_instr[23] top.cpu_tb.i_instr[22] top.cpu_tb.i_instr[21] top.cpu_tb.i_instr[20] top.cpu_tb.i_instr[19] top.cpu_tb.i_instr[18] top.cpu_tb.i_instr[17] top.cpu_tb.i_instr[16] top.cpu_tb.i_instr[15] top.cpu_tb.i_instr[14] top.cpu_tb.i_instr[13] top.cpu_tb.i_instr[12] top.cpu_tb.i_instr[11] top.cpu_tb.i_instr[10] top.cpu_tb.i_instr[9] top.cpu_tb.i_instr[8] top.cpu_tb.i_instr[7] top.cpu_tb.i_instr[6] top.cpu_tb.i_instr[5] top.cpu_tb.i_instr[4] top.cpu_tb.i_instr[3] top.cpu_tb.i_instr[2] top.cpu_tb.i_instr[1] top.cpu_tb.i_instr[0]
 #{top.cpu_tb.o_pc[31:0]} top.cpu_tb.o_pc[31] top.cpu_tb.o_pc[30] top.cpu_tb.o_pc[29] top.cpu_tb.o_pc[28] top.cpu_tb.o_pc[27] top.cpu_tb.o_pc[26] top.cpu_tb.o_pc[25] top.cpu_tb.o_pc[24] top.cpu_tb.o_pc[23] top.cpu_tb.o_pc[22] top.cpu_tb.o_pc[21] top.cpu_tb.o_pc[20] top.cpu_tb.o_pc[19] top.cpu_tb.o_pc[18] top.cpu_tb.o_pc[17] top.cpu_tb.o_pc[16] top.cpu_tb.o_pc[15] top.cpu_tb.o_pc[14] top.cpu_tb.o_pc[13] top.cpu_tb.o_pc[12] top.cpu_tb.o_pc[11] top.cpu_tb.o_pc[10] top.cpu_tb.o_pc[9] top.cpu_tb.o_pc[8] top.cpu_tb.o_pc[7] top.cpu_tb.o_pc[6] top.cpu_tb.o_pc[5] top.cpu_tb.o_pc[4] top.cpu_tb.o_pc[3] top.cpu_tb.o_pc[2] top.cpu_tb.o_pc[1] top.cpu_tb.o_pc[0]
@@ -101,7 +103,6 @@ top.cpu_tb.mem_uut.i_write
 #{top.cpu_tb.mem_uut.mem[2][2][7:0]} top.cpu_tb.mem_uut.mem[2][2][7] top.cpu_tb.mem_uut.mem[2][2][6] top.cpu_tb.mem_uut.mem[2][2][5] top.cpu_tb.mem_uut.mem[2][2][4] top.cpu_tb.mem_uut.mem[2][2][3] top.cpu_tb.mem_uut.mem[2][2][2] top.cpu_tb.mem_uut.mem[2][2][1] top.cpu_tb.mem_uut.mem[2][2][0]
 #{top.cpu_tb.mem_uut.mem[2][3][7:0]} top.cpu_tb.mem_uut.mem[2][3][7] top.cpu_tb.mem_uut.mem[2][3][6] top.cpu_tb.mem_uut.mem[2][3][5] top.cpu_tb.mem_uut.mem[2][3][4] top.cpu_tb.mem_uut.mem[2][3][3] top.cpu_tb.mem_uut.mem[2][3][2] top.cpu_tb.mem_uut.mem[2][3][1] top.cpu_tb.mem_uut.mem[2][3][0]
 #{top.cpu_tb.mem_uut.mem[2][4][7:0]} top.cpu_tb.mem_uut.mem[2][4][7] top.cpu_tb.mem_uut.mem[2][4][6] top.cpu_tb.mem_uut.mem[2][4][5] top.cpu_tb.mem_uut.mem[2][4][4] top.cpu_tb.mem_uut.mem[2][4][3] top.cpu_tb.mem_uut.mem[2][4][2] top.cpu_tb.mem_uut.mem[2][4][1] top.cpu_tb.mem_uut.mem[2][4][0]
-@23
 #{top.cpu_tb.mem_uut.mem[2][5][7:0]} top.cpu_tb.mem_uut.mem[2][5][7] top.cpu_tb.mem_uut.mem[2][5][6] top.cpu_tb.mem_uut.mem[2][5][5] top.cpu_tb.mem_uut.mem[2][5][4] top.cpu_tb.mem_uut.mem[2][5][3] top.cpu_tb.mem_uut.mem[2][5][2] top.cpu_tb.mem_uut.mem[2][5][1] top.cpu_tb.mem_uut.mem[2][5][0]
 [pattern_trace] 1
 [pattern_trace] 0

@@ -23,7 +23,7 @@ begin
     begin
         -- Source A
         if not is_X(sel_A) then
-            if unsigned(sel_A) = 0 then
+            if unsigned(sel_A) = 31 then
                 O_dataA <= X"00000000";
             else
                 O_dataA <= regs(to_integer(unsigned(sel_A)));
@@ -32,7 +32,7 @@ begin
         
         -- Source B
         if not is_X(sel_B) then
-            if unsigned(sel_B) = 0 then
+            if unsigned(sel_B) = 31 then
                 O_dataB <= X"00000000";
             else
                 O_dataB <= regs(to_integer(unsigned(sel_B)));

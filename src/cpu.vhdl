@@ -75,7 +75,7 @@ architecture Behavior of CPU is
     signal CB_opcode : std_logic_vector(7 downto 0);
     signal Rm, Rn, Rd : std_logic_vector(4 downto 0);
     signal shamt, shamt2 : std_logic_vector(5 downto 0);
-    signal Imm, Imm2 : std_logic_vector(11 downto 0);
+    signal Imm : std_logic_vector(11 downto 0);
     signal DT_address, DT_address2 : std_logic_vector(8 downto 0);
     signal DT_op : std_logic_vector(1 downto 0);
     signal BR_address : std_logic_vector(21 downto 0);
@@ -178,36 +178,36 @@ begin
                     case (R_opcode) is
                         -- Add
                         when "10001011000" =>
-                            sel_A <= Rm;
-                            sel_B <= Rn;
-                            --ALU_Op <= "0010";
-                            ALU_Op <= "000";
-                            RegWrite <= '1';
+                            --sel_A <= Rm;
+                            --sel_B <= Rn;
+                            ----ALU_Op <= "0010";
+                            --ALU_Op <= "000";
+                            --RegWrite <= '1';
                             
                         -- SUB
                         when "11001011000" =>
-                            sel_A <= Rm;
-                            sel_B <= Rn;
-                            --ALU_Op <= "0110";
-                            ALU_Op <= "000";
+                            --sel_A <= Rm;
+                            --sel_B <= Rn;
+                            ----ALU_Op <= "0110";
+                            --ALU_Op <= "000";
                             B_Inv <= '1';
                             RegWrite <= '1';
                         
                         -- AND
                         when "10001010000" =>
-                            sel_A <= Rm;
-                            sel_B <= Rn;
-                            --ALU_Op <= "0000";
-                            ALU_Op <= "111";
-                            RegWrite <= '1';
+                            --sel_A <= Rm;
+                            --sel_B <= Rn;
+                            ----ALU_Op <= "0000";
+                            --ALU_Op <= "111";
+                            --RegWrite <= '1';
                         
                         -- OR
                         when "10101010000" =>
-                            sel_A <= Rm;
-                            sel_B <= Rn;
-                            --ALU_Op <= "0001";
-                            ALU_Op <= "110";
-                            RegWrite <= '1';
+                            --sel_A <= Rm;
+                            --sel_B <= Rn;
+                            ----ALU_Op <= "0001";
+                            --ALU_Op <= "110";
+                            --RegWrite <= '1';
                         
                         -- LSL
                         --when "11010011011" =>
@@ -229,7 +229,6 @@ begin
                     case (I_opcode) is
                         -- ADDI
                         when "1001000100" =>
-                            Imm2 <= Imm;
                             srcImm <= '1';
                             --ALU_Op <= "0010";
                             ALU_Op <= "000";
@@ -237,12 +236,11 @@ begin
                             
                         -- SUBI
                         when "1101000100" =>
-                            Imm2 <= Imm;
-                            srcImm <= '1';
-                            --ALU_Op <= "0110";
-                            ALU_Op <= "000";
-                            B_Inv <= '1';
-                            RegWrite <= '1';
+                            --srcImm <= '1';
+                            ----ALU_Op <= "0110";
+                            --ALU_Op <= "000";
+                            --B_Inv <= '1';
+                            --RegWrite <= '1';
                         
                         when others =>
                         
@@ -358,9 +356,9 @@ begin
                     --elsif opcode = "0000011" then
                     --elsif opcode = "0000000" then
                     --else
-                        if rd = sel_A or rd = sel_B then
-                            IF_stall <= '1';
-                        end if;
+                        --if rd = sel_A or rd = sel_B then
+                        --    IF_stall <= '1';
+                        --end if;
                     --end if;
                 elsif stage = 2 and IF_stall = '1' then
                     IF_stall <= '0';
