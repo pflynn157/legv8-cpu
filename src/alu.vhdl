@@ -6,53 +6,67 @@ entity ALU is
     port (
         A      : in std_logic_vector(31 downto 0);
         B      : in std_logic_vector(31 downto 0);
-        Op     : in std_logic_vector(2 downto 0);
-        B_Inv  : in std_logic;
+        ALU_Op : in std_logic_vector(3 downto 0);
         Zero   : out std_logic;
         Result : out std_logic_vector(31 downto 0)
     );
 end ALU;
 
 architecture Behavior of ALU is
+    signal shift : std_logic_vector(2 downto 0) := "001";
+    signal Rs1 : std_logic_vector(31 downto 0) := X"00000000";
 begin
-    process (A, B, Op, B_Inv)
+    process (A, B, ALU_Op)
     begin
-        case Op is
-            -- ADD
-            when "000" =>
-                if B_Inv = '1' then
-                    Result <= std_logic_vector(signed(A) - signed(B));
-                else
-                    Result <= std_logic_vector(unsigned(A) + unsigned(B));
-                end if;
-            
-            -- SLL
-            when "001" =>
-            
-            -- SLT
-            when "010" =>
-            
-            -- SLTU
-            when "011" =>
-            
-            -- XOR
-            when "100" =>
-                Result <= A xor B;
-            
-            -- SRL/SRA
-            -- SRA if B_Inv = 1
-            when "101" =>
-            
-            -- OR
-            when "110" =>
-                Result <= A or B;
-            
+        case ALU_Op is
             -- AND
-            when "111" =>
+            when "0000" =>
+                Zero <= '0';
                 Result <= A and B;
             
-            -- Who knows...
+            -- OR
+            when "0001" =>
+                Zero <= '0';
+                Result <= A or B;
+            
+            -- Add
+            when "0010" =>
+                Zero <= '0';
+                Result <= std_logic_vector(signed(A) + signed(B));
+            
+            -- Sub
+            when "0110" =>
+                Result <= std_logic_vector(signed(A) - signed(B));
+               -- if Rs1 = X"00000000" then
+                --    Zero <= '1';
+                --else
+                --    Zero <= '0';
+                --end if;
+                --Result <= Rs1;
+            
+            -- Set on less than
+            when "0111" =>
+                if signed(A) < signed(B) then
+                    Zero <= '1';
+                else
+                    Zero <= '0';
+                end if;
+            
+            -- LSL
+            when "1100" =>
+                Zero <= '0';
+                Result <= std_logic_vector(shift_left(unsigned(A), to_integer(unsigned(B))));
+                
+            -- LSR
+            when "1101" =>
+                Zero <= '0';
+                Result <= std_logic_vector(shift_right(unsigned(A), to_integer(unsigned(B))));
+            
+            -- Trash
             when others =>
+                Zero <= '0';
+                Result <= X"00000000";
+                
         end case;
     end process;
 end Behavior;

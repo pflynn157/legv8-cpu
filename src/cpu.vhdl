@@ -46,8 +46,7 @@ architecture Behavior of CPU is
         port (
             A      : in std_logic_vector(31 downto 0);
             B      : in std_logic_vector(31 downto 0);
-            Op     : in std_logic_vector(2 downto 0);
-            B_Inv  : in std_logic;
+            ALU_op : in std_logic_vector(3 downto 0);
             Zero   : out std_logic;
             Result : out std_logic_vector(31 downto 0)
         );
@@ -74,7 +73,7 @@ architecture Behavior of CPU is
     signal B_opcode : std_logic_vector(5 downto 0);
     signal CB_opcode : std_logic_vector(7 downto 0);
     signal Rm, Rn, Rd : std_logic_vector(4 downto 0);
-    signal shamt, shamt2 : std_logic_vector(5 downto 0);
+    signal shamt : std_logic_vector(5 downto 0);
     signal Imm : std_logic_vector(11 downto 0);
     signal DT_address, DT_address2 : std_logic_vector(8 downto 0);
     signal DT_op : std_logic_vector(1 downto 0);
@@ -84,8 +83,8 @@ architecture Behavior of CPU is
     
     -- Signals for the ALU component
     signal A, B, Result: std_logic_vector(31 downto 0);
-    signal ALU_Op : std_logic_vector(2 downto 0);
-    signal B_Inv, Zero : std_logic := '0';
+    signal ALU_Op, ALU_Op1 : std_logic_vector(3 downto 0);
+    signal Zero : std_logic := '0';
     
     -- Signals for the register file component
     signal sel_A, sel_B, sel_D : std_logic_vector(4 downto 0);
@@ -131,8 +130,7 @@ begin
     uut_ALU : ALU port map (
         A => A,
         B => B,
-        Op => ALU_Op,
-        B_Inv => B_Inv,
+        ALU_Op => ALU_Op,
         Zero => Zero,
         Result => Result
     );
@@ -181,50 +179,39 @@ begin
                     case (R_opcode) is
                         -- Add
                         when "10001011000" =>
-                            --sel_A <= Rm;
-                            --sel_B <= Rn;
-                            ----ALU_Op <= "0010";
-                            --ALU_Op <= "000";
-                            --RegWrite <= '1';
+                            ALU_Op1 <= "0010";
+                            RegWrite <= '1';
                             
                         -- SUB
                         when "11001011000" =>
-                            --sel_A <= Rm;
-                            --sel_B <= Rn;
-                            ----ALU_Op <= "0110";
-                            --ALU_Op <= "000";
-                            B_Inv <= '1';
+                            sel_A <= Rm;
+                            sel_B <= Rn;
+                            ALU_Op1 <= "0110";
                             RegWrite <= '1';
                         
                         -- AND
                         when "10001010000" =>
-                            --sel_A <= Rm;
-                            --sel_B <= Rn;
-                            ----ALU_Op <= "0000";
-                            --ALU_Op <= "111";
-                            --RegWrite <= '1';
+                            ALU_Op1 <= "0000";
+                            RegWrite <= '1';
                         
                         -- OR
                         when "10101010000" =>
-                            --sel_A <= Rm;
-                            --sel_B <= Rn;
-                            ----ALU_Op <= "0001";
-                            --ALU_Op <= "110";
-                            --RegWrite <= '1';
+                            ALU_Op1 <= "0001";
+                            RegWrite <= '1';
                         
                         -- LSL
-                        --when "11010011011" =>
-                        --    srcShamt <= '1';
-                        --    --ALU_Op <= "1100";
-                        --    RegWrite <= '1';
-                        --    shamt2 <= shamt;
+                        when "11010011011" =>
+                            ALU_Op1 <= "1100";
+                            Imm_S2 <= "000000" & shamt;
+                            RegWrite <= '1';
+                            srcImm <= '1';
                         
                         -- LSR
-                        --when "11010011010" =>
-                        --    srcShamt <= '1';
-                        --    ALU_Op <= "1101";
-                        --    RegWrite <= '1';
-                        --    shamt2 <= shamt;
+                        when "11010011010" =>
+                            ALU_Op1 <= "1101";
+                            Imm_S2 <= "000000" & shamt;
+                            RegWrite <= '1';
+                            srcImm <= '1';
                     
                         when others =>
                         
@@ -233,18 +220,16 @@ begin
                         -- ADDI
                         when "1001000100" =>
                             srcImm <= '1';
-                            --ALU_Op <= "0010";
-                            ALU_Op <= "000";
+                            ALU_Op1 <= "0010";
                             RegWrite <= '1';
                             type_I := true;
                             
                         -- SUBI
                         when "1101000100" =>
-                            --srcImm <= '1';
-                            ----ALU_Op <= "0110";
-                            --ALU_Op <= "000";
-                            --B_Inv <= '1';
-                            --RegWrite <= '1';
+                            srcImm <= '1';
+                            ALU_Op1 <= "0110";
+                            RegWrite <= '1';
+                            type_I := true;
                         
                         when others =>
                         
@@ -269,7 +254,7 @@ begin
                         
                         -- MOV
                         when "11010010100" =>
-                            ALU_Op <= "000";
+                            ALU_Op1 <= "0010";
                             RegWrite <= '1';
                             Reg2Loc <= '1';
                             
@@ -383,6 +368,7 @@ begin
                     RegWrite2 <= RegWrite;
                     MemData <= O_dataB;
                     Data_Len2 <= Data_Len;
+                    ALU_Op <= ALU_Op1;
                     
                     A <= O_dataA;
                     if srcImm = '1' then
