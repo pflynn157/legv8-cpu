@@ -50,23 +50,29 @@ architecture Behavior of cpu_tb is
     signal data_len : std_logic_vector(1 downto 0) := "00";
     signal address, I_data, O_data : std_logic_vector(31 downto 0) := X"00000000";
     
+    -- Instruction constants
+    constant ADD : std_logic_vector := "10001011000";
+    constant SUB : std_logic_vector := "11001011000";
+    constant R_AND : std_logic_vector := "10001010000";
+    constant R_OR : std_logic_vector := "10101010000";
+    constant R_LSL : std_logic_vector := "11010011011";
+    constant R_LSR : std_logic_vector := "11010011010";
+    constant MOV : std_logic_vector := "1101001010000000000000";
+    constant NOP : std_logic_vector := "1101001111100000000000";
+    constant ADDI : std_logic_vector := "1001000100";
+    constant SUBI : std_logic_vector := "1101000100";
+    constant STUR : std_logic_vector := "11111000000";
+    constant LDUR : std_logic_vector := "11111000010";
+    constant CMP : std_logic_vector := "10110101";
+    constant B : std_logic_vector := "000101";
+    constant BC : std_logic_vector := "010101";    -- Conditional branch of any kind
+    
     -- Our test program
-    constant SIZE : integer := 13;
+    constant SIZE : integer := 2;
     type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
     signal rom_memory : instr_memory := (
-        "000000000101" & "00000" & "000" & "00001" & "0010011",   -- ADDI X1, X0, 5
-        "000000000110" & "00000" & "000" & "00010" & "0010011",   -- ADDI X2, X0, 6
-        "000000001010" & "00010" & "000" & "00011" & "0010011",   -- ADDI X3, X2, 10
-        "011011110100" & "00000" & "000" & "00001" & "0010011",   -- ADDI X1, X0, 0x6F4
-        "000000000110" & "00000" & "000" & "00010" & "0010011",   -- ADDI X2, X0, 6
-        "0000000" & "00000" & "00001" & "000" & "00000" & "0100011",   -- SB X1, [X0, 0]
-        "000000100000" & "00000" & "000" & "00010" & "0010011",   -- ADDI X2, X0, 32
-        "000000010000" & "00000" & "000" & "00011" & "0010011",   -- ADDI X3, X0, 16
-        "0000000" & "00011" & "00001" & "001" & "00000" & "0100011",  -- SH X1, [X3, 0]
-        "0000000" & "00010" & "00001" & "010" & "00000" & "0100011",  -- SW X1, [X2, 0]
-        "000000010000" & "00000" & "000" & "00011" & "0010011",        -- ADDI X3, X0, 16
-        "000000000000" & "00000" & "000" & "00010" & "0000011",       -- LB X2, [X0, 0]
-        "000000000111" & "00000" & "000" & "00001" & "0010011"        -- ADDI X1, X0, 7
+        ADDI & "000000000010" & "00001" & "00001",            -- ADDI X1, X1, #2 
+        ADDI & "000000000100" & "00000" & "00000"             -- ADDI X0, X0, #4 
     );
 begin
     uut : CPU port map (
