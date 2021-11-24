@@ -77,8 +77,8 @@ architecture Behavior of CPU is
     signal Imm : std_logic_vector(11 downto 0);
     signal DT_address : std_logic_vector(8 downto 0);
     signal DT_op : std_logic_vector(1 downto 0);
-    signal BR_address : std_logic_vector(21 downto 0);
-    signal BR_op : std_logic_vector(3 downto 0);
+    signal BR_address, BR_Address2 : std_logic_vector(21 downto 0);
+    signal BR_op, BR_op2 : std_logic_vector(3 downto 0);
     signal CBR_address : std_logic_vector(18 downto 0);
     
     -- Signals for the ALU component
@@ -106,7 +106,7 @@ architecture Behavior of CPU is
 
     -- Pipeline and program counter signals
     signal PC : std_logic_vector(31 downto 0) := X"00000000";
-    signal IF_stall, MEM_stall : std_logic := '0';
+    signal IF_stall, MEM_stall, Cond_Br : std_logic := '0';
     signal WB_stall, Br : integer := 0;
 begin
     -- Connect the decoder
@@ -153,9 +153,11 @@ begin
 
     process (clk)
         variable type_I, type_C : boolean := false;
+        variable Should_Br : boolean := false;
     begin
         type_I := false;
         type_C := false;
+        Should_Br := false;
         
         if rising_edge(clk) then
             if reset = '1' then
@@ -183,7 +185,9 @@ begin
                     Mem_Stall <= '0';
                     MemRead <= '0';
                     SetFlags <= '0';
+                    Cond_Br <= '0';
                     Imm_S2 <= Imm;
+                    BR_Address2 <= BR_Address;
                     
                     -- R-format instructons
                     case (R_opcode) is
@@ -298,52 +302,9 @@ begin
                         
                         -- BR
                         when "010101" =>
-                            --case (BR_op) is
-                            --    -- BEQ
-                            --    when "0000" =>
-                            --        if flags(0) = '1' then
-                            --            PC <= PC + ((to_integer(signed(BR_address)) - 1) * 32);
-                            --            Stall <= '1';
-                            --        end if;
-                            --    
-                            --    -- BNE
-                            --    when "0001" =>
-                            --        if flags(0) = '0' then
-                            --            PC <= PC + ((to_integer(signed(BR_address)) - 1) * 32);
-                            --            Stall <= '1';
-                            --        end if;
-                            --    
-                            --    -- BGT
-                            --    when "1100" =>
-                            --        if flags(2) = '1' then
-                            --            PC <= PC + ((to_integer(signed(BR_address)) - 1) * 32);
-                            --            Stall <= '1';
-                            --        end if;
-                            --    
-                            --    -- BGE
-                            --    when "1010" =>
-                            --        if flags(2) = '1' or flags(0) = '1' then
-                            --            PC <= PC + ((to_integer(signed(BR_address)) - 1) * 32);
-                            --            Stall <= '1';
-                            --        end if;
-                            --    
-                            --    -- BLT
-                            --    when "1011" =>
-                            --        if flags(1) = '1' then
-                            --            PC <= PC + ((to_integer(signed(BR_address)) - 1) * 32);
-                            --            Stall <= '1';
-                            --        end if;
-                            --    
-                            --    -- BLE
-                            --    when "1101" =>
-                            --        if flags(1) = '1' or flags(0) = '1' then
-                            --            PC <= PC + ((to_integer(signed(BR_address)) - 1) * 32);
-                            --            Stall <= '1';
-                            --        end if;
-                            --    
-                            --    -- TODO: The CPU should have a heart attack
-                            --    when others =>
-                            --end case;
+                            BR_op2 <= BR_op;
+                            Cond_Br <= '1';
+                            IF_Stall  <= '1';
                         
                         when others =>
                     
@@ -357,6 +318,7 @@ begin
                             ALU_Op1 <= "0110";
                             SetFlags <= '1';
                             type_C := true;
+                            IF_Stall <= '1';
                         
                         -- CBZ
                         
@@ -393,7 +355,7 @@ begin
                     Br <= Br - 1;
                 
                 -- Instruction execute
-                elsif stage = 3 then
+                elsif stage = 3 and Cond_Br = '0' then
                     sel_D_2 <= sel_D_1;
                     MemWrite2 <= MemWrite;
                     MemRead2 <= MemRead;
@@ -412,6 +374,62 @@ begin
                     else
                         B <= O_dataB;
                     end if;
+                    
+                -- Instruction execute- specific for conditional branches
+                elsif stage = 3 and Cond_Br = '1' then
+                    case (BR_op2) is
+                        -- BEQ
+                        when "0000" =>
+                            if flags(0) = '1' or signed(Result) = 0 then
+                                PC <= std_logic_vector((signed(PC)) + (signed("000000" & BR_address2) - 2));
+                                O_PC <= PC;
+                                Br <= 2;
+                            end if;
+                            
+                        -- BNE
+                        when "0001" =>
+                            if flags(0) = '0' or signed(Result) /= 0 then
+                                PC <= std_logic_vector((signed(PC)) + (signed("000000" & BR_address2) - 2));
+                                O_PC <= PC;
+                                Br <= 2;
+                            end if;
+                            
+                        -- BLT
+                        when "1011" =>
+                            if flags(1) = '1' or signed(Result) < 0 then
+                                PC <= std_logic_vector((signed(PC)) + (signed("000000" & BR_address2) - 2));
+                                O_PC <= PC;
+                                Br <= 2;
+                            end if;
+                            
+                        -- BLE
+                        when "1101" =>
+                            if (flags(1) = '1' or signed(Result) < 0) or (flags(0) = '1' or signed(Result) = 0) then
+                                PC <= std_logic_vector((signed(PC)) + (signed("000000" & BR_address2) - 2));
+                                O_PC <= PC;
+                                Br <= 2;
+                            end if;
+                            
+                        -- BGT
+                        when "1100" =>
+                            if flags(2) = '1' or signed(Result) > 0 then
+                                PC <= std_logic_vector((signed(PC)) + (signed("000000" & BR_address2) - 2));
+                                O_PC <= PC;
+                                Br <= 2;
+                            end if;
+                            
+                        -- BGE
+                        when "1010" =>
+                            if (flags(2) = '1' or signed(Result) > 0) or (flags(0) = '1' or signed(Result) = 0) then
+                                PC <= std_logic_vector((signed(PC)) + (signed("000000" & BR_address2) - 2));
+                                O_PC <= PC;
+                                Br <= 2;
+                            end if;
+                            
+                        when others =>
+                    end case;
+                    
+                    Cond_Br <= '0';
                 
                 -- Memory
                 elsif stage = 4 and Mem_Stall = '0' then

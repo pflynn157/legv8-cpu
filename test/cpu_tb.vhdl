@@ -67,6 +67,14 @@ architecture Behavior of cpu_tb is
     constant B : std_logic_vector := "000101";
     constant BC : std_logic_vector := "010101";    -- Conditional branch of any kind
     
+    -- For the conditional branches
+    constant BEQ : std_logic_vector := "0000";
+    constant BNE : std_logic_vector := "0001";
+    constant BGT : std_logic_vector := "1100";
+    constant BGE : std_logic_vector := "1010";
+    constant BLT : std_logic_vector := "1011";
+    constant BLE : std_logic_vector := "1101";
+    
     -- Our test program
     --constant SIZE : integer := 22;
     --type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
@@ -128,15 +136,60 @@ architecture Behavior of cpu_tb is
       ---  ADDI & "000000000011" & "11111" & "00000"               -- ADDI X0, XZR, #3
     --;
     
-    constant SIZE : integer := 5;
+    --constant SIZE : integer := 5;
+    --type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
+    --signal rom_memory : instr_memory := (
+    --    ADDI & "000000000011" & "11111" & "00000",               -- ADDI X0, XZR, #3
+    --    ADDI & "000000000011" & "11111" & "00001",               -- ADDI X1, XZR, #3
+    --    --NOP & "0000000000",
+    --    CMP & "00" & "000000000000" & "00000" & "00001",       -- CMP X0, X1          (FLAGS = 001) 3-3 = 0
+    --    ADDI & "000000000111" & "11111" & "00001",               -- ADDI X1, XZR, #7
+    --    ADDI & "000000000111" & "11111" & "00000"               -- ADDI X0, XZR, #7
+    --);
+    
+    constant SIZE : integer := 40;
     type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
     signal rom_memory : instr_memory := (
-        ADDI & "000000000011" & "11111" & "00000",               -- ADDI X0, XZR, #3
-        ADDI & "000000000011" & "11111" & "00001",               -- ADDI X1, XZR, #3
-        --NOP & "0000000000",
-        CMP & "00" & "000000000000" & "00000" & "00001",       -- CMP X0, X1          (FLAGS = 001) 3-3 = 0
-        ADDI & "000000000111" & "11111" & "00001",               -- ADDI X1, XZR, #7
-        ADDI & "000000000111" & "11111" & "00000"               -- ADDI X0, XZR, #7
+        ADDI & "000000000011" & "11111" & "00000",               -- [0] ADDI X0, XZR, #3
+        ADDI & "000000000011" & "11111" & "00001",               -- [1] ADDI X1, XZR, #3
+        CMP & "00" & "000000000000" & "00000" & "00001",         -- [2] CMP X0, X1          (FLAGS = 001) 3-3 = 0
+        BC & "0000000000000000000011" & BEQ,                     -- [3] BEQ 3
+        ADDI & "000000000001" & "11111" & "00101",               -- [4] ADDI X5, XZR, #1 (should NOT happen)
+        ADDI & "000000000001" & "11111" & "00100",               -- [5] ADDI X4, XZR, #1 (should NOT happen)
+        ADDI & "000000000001" & "00010" & "00010",               -- [6] ADDI X2, X2, #1 (should happen)                X2 = 1
+        ADDI & "000000000001" & "11111" & "00000",               -- [7] ADDI X0, XZR, #1
+        CMP & "00" & "000000000000" & "00000" & "00001",         -- [8] CMP X0, X1          (FLAGS = 010) 1-3 = -2
+        BC & "0000000000000000000011" & BNE,                     -- [9] BNE 3
+        ADDI & "000000000010" & "11111" & "00101",               -- [10] ADDI X5, XZR, #2 (should NOT happen)
+        ADDI & "000000000010" & "11111" & "00100",               -- [11] ADDI X4, XZR, #2 (should NOT happen)
+        ADDI & "000000000010" & "00010" & "00010",               -- [12] ADDI X2, X2, #2 (should happen)               X2 = 3
+        CMP & "00" & "000000000000" & "00000" & "00001",         -- [13] CMP X0, X1          (FLAGS = 010) 1-3 = -2
+        BC & "0000000000000000000011" & BLT,                     -- [14] BLT 3
+        ADDI & "000000000011" & "11111" & "00101",               -- [15] ADDI X5, XZR, #3 (should NOT happen)
+        ADDI & "000000000011" & "11111" & "00100",               -- [16] ADDI X4, XZR, #3 (should NOT happen)
+        ADDI & "000000000010" & "00010" & "00010",               -- [17] ADDI X2, X2, #2 (should happen)               X2 = 5
+        CMP & "00" & "000000000000" & "00000" & "00001",         -- [18] CMP X0, X1          (FLAGS = 001) 1-3 = -1
+        BC & "0000000000000000000011" & BLE,                     -- [19] BLE 3  (1 - 3 = -2) -> BRANCH
+        ADDI & "000000000011" & "11111" & "00101",               -- [20] ADDI X5, XZR, #3 (should NOT happen)
+        ADDI & "000000000011" & "11111" & "00100",               -- [21] ADDI X4, XZR, #3 (should NOT happen)
+        ADDI & "000000000010" & "00010" & "00010",               -- [22] ADDI X2, X2, #2 (should happen)              X2 = 7
+        ADDI & "000000000011" & "11111" & "00000",               -- [23] ADDI X0, XZR, #3
+        CMP & "00" & "000000000000" & "00000" & "00001",         -- [24] CMP X0, X1          (FLAGS = 001) 3-3 = 0
+        BC & "0000000000000000000011" & BLE,                     -- [25] BLE 3  (3 - 3 = 0) -> BRANCH 
+        ADDI & "000000000011" & "11111" & "00101",               -- [26] ADDI X5, XZR, #3 (should NOT happen)
+        ADDI & "000000000011" & "11111" & "00100",               -- [27] ADDI X4, XZR, #3 (should NOT happen)
+        ADDI & "000000000010" & "00010" & "00010",               -- [28] ADDI X2, X2, #2 (should happen)              X2 = 9
+        CMP & "00" & "000000000000" & "00000" & "00001",         -- [29] CMP X0, X1          (FLAGS = 001) 3-3 = 0
+        BC & "0000000000000000000011" & BGE,                     -- [30] BGE 3  (1 - 3 = -2) -> BRANCH 
+        ADDI & "000000000011" & "11111" & "00101",               -- [31] ADDI X5, XZR, #3 (should NOT happen)
+        ADDI & "000000000011" & "11111" & "00100",               -- [32] ADDI X4, XZR, #3 (should NOT happen)
+        ADDI & "000000000010" & "00010" & "00010",               -- [33] ADDI X2, X2, #2 (should happen)              X2 = 11 (B)
+        ADDI & "000000001010" & "11111" & "00000",               -- [34] ADDI X0, XZR, #10
+        CMP & "00" & "000000000000" & "00000" & "00001",         -- [35] CMP X0, X1          (FLAGS = 100) 10-3 = 7
+        BC & "0000000000000000000011" & BGT,                     -- [36] BGE 3  (10 - 3 = 7) -> BRANCH
+        ADDI & "000000000011" & "11111" & "00101",               -- [37] ADDI X5, XZR, #3 (should NOT happen)
+        ADDI & "000000000011" & "11111" & "00100",               -- [38] ADDI X4, XZR, #3 (should NOT happen)
+        ADDI & "000000000010" & "00010" & "00010"                -- [39] ADDI X2, X2, #2 (should happen)              X2 = 13 (D)
     );
 begin
     uut : CPU port map (
