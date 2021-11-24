@@ -102,8 +102,9 @@ architecture Behavior of CPU is
 
     -- Pipeline and program counter signals
     signal PC : std_logic_vector(31 downto 0) := X"00000000";
-    signal IF_stall, MEM_stall : std_logic := '0';
+    signal IF_stall, MEM_stall, Br_Stall : std_logic := '0';
     signal WB_stall : integer := 0;
+    signal PC_Inc : integer := 0;
 begin
     -- Connect the decoder
     -- Map the decoder
@@ -151,6 +152,7 @@ begin
         variable type_I : boolean := false;
     begin
         type_I := false;
+        
         if rising_edge(clk) then
             if reset = '1' then
                 O_Mem_Write <= '0';
@@ -158,11 +160,16 @@ begin
         
             for stage in 1 to 5 loop
                 -- Instruction fetch
-                if stage = 1 and IF_stall = '0' then
+                if stage = 1 and IF_stall = '0' and Br_Stall = '0' then
                     PC <= std_logic_vector(unsigned(PC) + 1);
                     instr <= I_instr;
                 elsif stage = 1 and IF_stall = '1' then
-                    PC <= std_logic_vector(unsigned(PC) - 1);
+                    if PC_Inc = 0 then
+                        PC <= std_logic_vector(unsigned(PC) - 1);
+                    else
+                        PC <= std_logic_vector((unsigned(PC) - 1) + PC_Inc);
+                    end if;
+                    
                     
                 -- Instruction decode
                 elsif stage = 2 and IF_stall = '0' then
@@ -275,7 +282,17 @@ begin
                         -- B
                         when "000101" =>
                             --PC <= PC + ((to_integer(signed(BR_address & BR_op)) - 1) * 32);
-                            --Stall <= '1';
+                            --PC <= std_logic_vector((signed(PC)) + (signed("000000" & BR_address & BR_op)));
+                            --if to_integer(unsigned(PC)) = 1 then
+                            --    PC <= std_logic_vector(signed(PC) + (signed("000000" & BR_address & BR_op) - 1));
+                            --end if;
+                            --O_PC <= PC;
+                            --IF_Stall <= '1';
+                            --is_Br := true;
+                            --Br <= '1';
+                            IF_Stall <= '1';
+                            --PC_Inc <= to_integer(signed(PC)) + to_integer(signed("000000" & BR_address & BR_op));
+                            PC_Inc <= to_integer(signed("000000" & BR_address & BR_op));
                         
                         -- BR
                         when "010101" =>
@@ -364,6 +381,7 @@ begin
                     --end if;
                 elsif stage = 2 and IF_stall = '1' then
                     IF_stall <= '0';
+                    PC_Inc <= 0;
                 
                 -- Instruction execute
                 elsif stage = 3 then
