@@ -101,7 +101,7 @@ architecture Behavior of cpu_tb is
     --    ADDI & "000000000101" & "00000" & "00000"             -- ADDI X0, X0, #5    (X0 == 9)
     --);
     
-    constant SIZE : integer := 12;
+    constant SIZE : integer := 14;
     type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
     signal rom_memory : instr_memory := (
         B & "0000000000000000000000" & "0100",                   -- [0] B <4> -> (4 * 32)
@@ -115,8 +115,9 @@ architecture Behavior of cpu_tb is
         ADDI & "000000000101" & "00010" & "00010",             -- [8] ADDI X2, X2, #5 (should NOT happen)
         ADDI & "000000000100" & "00011" & "00011",             -- [9] ADDI X3, X3, #4 (should happen)
         ADDI & "000000000111" & "00100" & "00100",             -- [10] ADDI X4, X4, #7 (should happen)
+        B & "1111111111111111111111" & "0101",                 -- [11] B <-9> -> (4 * 32)
+        NOP & "0000000000",
         NOP & "0000000000"
-       -- B & "1111111111111111111111" & "0111"              -- [0] B <-9> -> (4 * 32)
     );
 begin
     uut : CPU port map (
@@ -157,14 +158,19 @@ begin
         I_instr <= rom_memory(0);
         wait until O_PC'event;
         
-        for i in 1 to SIZE loop
-            if to_integer(unsigned(O_PC)) < SIZE then
-                I_instr <= rom_memory(to_integer(unsigned(O_PC)));
-                wait until O_PC'event;
-            --else
-             --   Reset <= '1';
-            end if;
+        while to_integer(unsigned(O_PC)) < SIZE loop
+            I_instr <= rom_memory(to_integer(unsigned(O_PC)));
+            wait until O_PC'event;
         end loop;
+        
+        --for i in 1 to SIZE loop
+        --    if to_integer(unsigned(O_PC)) < SIZE then
+        --        I_instr <= rom_memory(to_integer(unsigned(O_PC)));
+        --        wait until O_PC'event;
+        --    --else
+        --     --   Reset <= '1';
+        --    end if;
+        --end loop;
         
         I_instr <= rom_memory(SIZE - 1);
         Reset <= '1';
