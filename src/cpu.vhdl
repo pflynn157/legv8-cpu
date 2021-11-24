@@ -99,6 +99,10 @@ architecture Behavior of CPU is
     signal Imm_S2 : std_logic_vector(11 downto 0);
     signal MemData : std_logic_vector(31 downto 0);
     signal Data_Len, Data_Len2 : std_logic_vector(1 downto 0);
+    
+    -- Comparison-related stuff
+    signal Flags : std_logic_vector(2 downto 0) := "000";   -- GT LT EQ
+    signal SetFlags, SetFlags2 : std_logic := '0';
 
     -- Pipeline and program counter signals
     signal PC : std_logic_vector(31 downto 0) := X"00000000";
@@ -148,9 +152,10 @@ begin
     );
 
     process (clk)
-        variable type_I : boolean := false;
+        variable type_I, type_C : boolean := false;
     begin
         type_I := false;
+        type_C := false;
         
         if rising_edge(clk) then
             if reset = '1' then
@@ -177,6 +182,7 @@ begin
                     MemWrite <= '0';
                     Mem_Stall <= '0';
                     MemRead <= '0';
+                    SetFlags <= '0';
                     Imm_S2 <= Imm;
                     
                     -- R-format instructons
@@ -345,10 +351,12 @@ begin
                     case (CB_opcode) is
                         -- CMP
                         when "10110101" =>
-                            --sel_A <= Rn;
-                            --sel_B <= Rd;
-                            --ALU_Op1 <= "0110";
-                            --SetFlags <= '1';
+                            sel_D_1 <= "XXXXX";
+                            sel_A <= Rn;
+                            sel_B <= Rd;
+                            ALU_Op1 <= "0110";
+                            SetFlags <= '1';
+                            type_C := true;
                         
                         -- CBZ
                         
@@ -362,6 +370,10 @@ begin
                     -- Check to see if we have a RAW dependency. If so, stall the pipeline
                     if type_I then
                         if rn = sel_d_1 then
+                            IF_stall <= '1';
+                        end if;
+                    elsif type_C then
+                        if rn = sel_d_1 or rd = sel_d_1 then
                             IF_stall <= '1';
                         end if;
                     end if;
@@ -389,6 +401,7 @@ begin
                     MemData <= O_dataB;
                     Data_Len2 <= Data_Len;
                     ALU_Op <= ALU_Op1;
+                    SetFlags2 <= SetFlags;
                     
                     A <= O_dataA;
                     if srcImm = '1' then
@@ -428,8 +441,16 @@ begin
                         I_enD <= '0';
                     end if;
                     
-                    -- Prepare for instrution fetch on next cycle
-                    --O_PC <= PC;
+                    -- Write the flags registers
+                    if SetFlags2 = '1' then
+                        if signed(Result) < 0 then
+                            Flags <= "010";
+                        elsif signed(Result) > 0 then
+                            Flags <= "100";
+                        else
+                            Flags <= "001";
+                        end if;
+                    end if;
                 elsif stage = 5 and WB_Stall > 0 then
                     WB_Stall <= WB_stall - 1;
                 end if;

@@ -93,31 +93,50 @@ architecture Behavior of cpu_tb is
     --    LDUR & "000000011" & "00" & "11111" & "00101",         -- LDUR X5, [XZR, #3]     (X5 == 10)
     --    ADDI & "000000000010" & "00101" & "00101",             -- ADDI X5, X5, #2        (X5 == 12)
     --    NOP & "0000000000"
-    --); 
-    
-    --signal rom_memory : instr_memory := (
-    --    ADDI & "000000000010" & "00001" & "00001",            -- ADDI X1, X1, #2 
-    --    ADDI & "000000000100" & "00000" & "00000",            -- ADDI X0, X0, #4
-    --    ADDI & "000000000101" & "00000" & "00000"             -- ADDI X0, X0, #5    (X0 == 9)
     --);
     
-    constant SIZE : integer := 14;
+    --constant SIZE : integer := 14;
+    --type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
+    --signal rom_memory : instr_memory := (
+    --    B & "0000000000000000000000" & "0100",                   -- [0] B <4> -> (4 * 32)
+    --    ADDI & "000000000001" & "00000" & "00000",             -- [1] ADDI X0, X0, #1 (should NOT happen)
+    --    ADDI & "000000000001" & "00001" & "00001",             -- [2] ADDI X1, X1, #1 (should NOT happen)
+    --    ADDI & "000000000001" & "00010" & "00010",             -- [3] ADDI X2, X2, #1 (should NOT happen)
+    --    ADDI & "000000000100" & "00011" & "00011",             -- [4] ADDI X3, X3, #4 (should happen)
+    --    B & "0000000000000000000000" & "0100",                 -- [5] B <4> -> (4 * 32)
+    --    ADDI & "000000000010" & "00000" & "00000",             -- [6] ADDI X0, X0, #2 (should NOT happen)
+    --    ADDI & "000000000101" & "00001" & "00001",             -- [7] ADDI X1, X1, #5 (should NOT happen)
+    --    ADDI & "000000000101" & "00010" & "00010",             -- [8] ADDI X2, X2, #5 (should NOT happen)
+    --    ADDI & "000000000100" & "00011" & "00011",             -- [9] ADDI X3, X3, #4 (should happen)
+    --    ADDI & "000000000111" & "00100" & "00100",             -- [10] ADDI X4, X4, #7 (should happen)
+    --    B & "1111111111111111111111" & "0101",                 -- [11] B <-9> -> (4 * 32)
+    --    NOP & "0000000000",
+    --    NOP & "0000000000"
+    --);
+    
+    --constant CODE3_SIZE : integer := 32 * 10 - 1;
+    --signal code3 : std_logic_vector(CODE3_SIZE downto 0) :=
+    --    CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 100) 10 - 7 = 3
+    --    NOP & "0000000000" &                                    -- NOP
+    --    ADDI & "000000001010" & "11111" & "00000" &             -- ADDI X0, XZR, #10
+    --    CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 010) 3 - 7 = -4
+    --    NOP & "0000000000" &                                    -- NOP
+    --    ADDI & "000000000111" & "11111" & "00001" &             -- ADDI X1, XZR, #7
+    --    CMP & "00" & "000000000000" & "00000" & "00001" &       -- CMP X0, X1          (FLAGS = 001) 3-3 = 0
+    --    NOP & "0000000000" &                                    -- NOP
+    --    ADDI & "000000000011" & "11111" & "00001" &             -- ADDI X1, XZR, #3
+      ---  ADDI & "000000000011" & "11111" & "00000"               -- ADDI X0, XZR, #3
+    --;
+    
+    constant SIZE : integer := 5;
     type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
     signal rom_memory : instr_memory := (
-        B & "0000000000000000000000" & "0100",                   -- [0] B <4> -> (4 * 32)
-        ADDI & "000000000001" & "00000" & "00000",             -- [1] ADDI X0, X0, #1 (should NOT happen)
-        ADDI & "000000000001" & "00001" & "00001",             -- [2] ADDI X1, X1, #1 (should NOT happen)
-        ADDI & "000000000001" & "00010" & "00010",             -- [3] ADDI X2, X2, #1 (should NOT happen)
-        ADDI & "000000000100" & "00011" & "00011",             -- [4] ADDI X3, X3, #4 (should happen)
-        B & "0000000000000000000000" & "0100",                 -- [5] B <4> -> (4 * 32)
-        ADDI & "000000000010" & "00000" & "00000",             -- [6] ADDI X0, X0, #2 (should NOT happen)
-        ADDI & "000000000101" & "00001" & "00001",             -- [7] ADDI X1, X1, #5 (should NOT happen)
-        ADDI & "000000000101" & "00010" & "00010",             -- [8] ADDI X2, X2, #5 (should NOT happen)
-        ADDI & "000000000100" & "00011" & "00011",             -- [9] ADDI X3, X3, #4 (should happen)
-        ADDI & "000000000111" & "00100" & "00100",             -- [10] ADDI X4, X4, #7 (should happen)
-        B & "1111111111111111111111" & "0101",                 -- [11] B <-9> -> (4 * 32)
-        NOP & "0000000000",
-        NOP & "0000000000"
+        ADDI & "000000000011" & "11111" & "00000",               -- ADDI X0, XZR, #3
+        ADDI & "000000000011" & "11111" & "00001",               -- ADDI X1, XZR, #3
+        --NOP & "0000000000",
+        CMP & "00" & "000000000000" & "00000" & "00001",       -- CMP X0, X1          (FLAGS = 001) 3-3 = 0
+        ADDI & "000000000111" & "11111" & "00001",               -- ADDI X1, XZR, #7
+        ADDI & "000000000111" & "11111" & "00000"               -- ADDI X0, XZR, #7
     );
 begin
     uut : CPU port map (
@@ -172,7 +191,8 @@ begin
         --    end if;
         --end loop;
         
-        I_instr <= rom_memory(SIZE - 1);
+        --I_instr <= rom_memory(SIZE - 1);
+        I_Instr <= X"00000000";
         Reset <= '1';
         wait;
     end process;
