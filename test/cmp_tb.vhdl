@@ -2,10 +2,10 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity cpu_tb is
-end cpu_tb;
+entity cmp_tb is
+end cmp_tb;
 
-architecture Behavior of cpu_tb is
+architecture Behavior of cmp_tb is
 
     -- Declare the CPU component
     component CPU is
@@ -76,51 +76,15 @@ architecture Behavior of cpu_tb is
     constant BLE : std_logic_vector := "1101";
     
     -- Our test program
-    constant SIZE : integer := 22;
+    constant SIZE : integer := 5;
     type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
     signal rom_memory : instr_memory := (
-        MOV & "11111" & "00000",                               -- MOV X0, XZR  
-        MOV & "11111" & "00001",                               -- MOV X1, XZR
-        MOV & "11111" & "00010",                               -- MOV X2, XZR
-        ADDI & "000000000100" & "00000" & "00000",             -- ADDI X0, X0, #4    (X0 == 4)
-        ADDI & "000000000010" & "00001" & "00001",             -- ADDI X1, X1, #2    (X1 == 2)
-        ADDI & "000000010000" & "00111" & "00111",             -- ADDI X7, X7, #2    (X7 == 16)
-        ADDI & "000000001010" & "00010" & "00010",             -- ADDI X2, X2, #10   (X2 == 10)
-        ADDI & "000000001011" & "11111" & "00011",             -- ADDI X3, XZR, #11   (X3 == 11)
-        ADD & "00000" & "000000" & "00001" & "00100",          -- ADD X4, X0, X1      (X4 == 6)
-        SUB & "00010" & "000010" & "00001" & "00100",          -- SUB X4, X2, X1       (X4 == 8)
-        R_AND & "00000" & "000000" & "00001" & "00100",        -- AND X4, X0, X1       (X4 == 0)
-        R_OR & "00000" & "000000" & "00001" & "00100",         --  OR X4, X0, X1       (X4 == 6)
-        R_LSL & "00000" & "000010" & "00000" & "00100",        -- LSL X4, X0, #2       (X4 == 16)
-        R_LSR & "00000" & "000010" & "00000" & "00100",        -- LSR X4, X0, #2       (X4 == 1)
-        ADDI & "000000000101" & "00010" & "00100",             -- ADDI X4, X2, #5      (X4 == 15)
-        SUBI & "000000000101" & "00010" & "00100",             -- SUBI X4, X2, #5      (X4 == 5)
-        STUR & "000000000" & "00" & "00111" & "00011",         -- STUR X3, [X7, #0]     MEM(0x10) = 11
-        STUR & "000000011" & "00" & "11111" & "00010",         -- STUR X2, [XZR, #3]    MEM(0x03) = 10
-        LDUR & "000000000" & "00" & "00111" & "00110",         -- LDUR X6, [X7, #0]     (X6 == 11)
-        LDUR & "000000011" & "00" & "11111" & "00101",         -- LDUR X5, [XZR, #3]     (X5 == 10)
-        ADDI & "000000000010" & "00101" & "00101",             -- ADDI X5, X5, #2        (X5 == 12)
-        NOP & "0000000000"
+        ADDI & "000000000011" & "11111" & "00000",               -- [0] ADDI X0, XZR, #3
+        ADDI & "000000000011" & "11111" & "00001",               -- [1] ADDI X1, XZR, #3
+        CMP & "00" & "000000000000" & "00000" & "00001",         -- [2] CMP X0, X1          (FLAGS = 001) 3-3 = 0
+        ADDI & "000000000111" & "11111" & "00001",               -- [3] ADDI X1, XZR, #7
+        ADDI & "000000000111" & "11111" & "00000"                -- [4] ADDI X0, XZR, #7
     );
-    
-    --constant SIZE : integer := 14;
-    --type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
-    --signal rom_memory : instr_memory := (
-    --    B & "0000000000000000000000" & "0100",                   -- [0] B <4> -> (4 * 32)
-    --    ADDI & "000000000001" & "00000" & "00000",             -- [1] ADDI X0, X0, #1 (should NOT happen)
-    --    ADDI & "000000000001" & "00001" & "00001",             -- [2] ADDI X1, X1, #1 (should NOT happen)
-    --    ADDI & "000000000001" & "00010" & "00010",             -- [3] ADDI X2, X2, #1 (should NOT happen)
-    --    ADDI & "000000000100" & "00011" & "00011",             -- [4] ADDI X3, X3, #4 (should happen)
-    --    B & "0000000000000000000000" & "0100",                 -- [5] B <4> -> (4 * 32)
-    --    ADDI & "000000000010" & "00000" & "00000",             -- [6] ADDI X0, X0, #2 (should NOT happen)
-    --    ADDI & "000000000101" & "00001" & "00001",             -- [7] ADDI X1, X1, #5 (should NOT happen)
-    --    ADDI & "000000000101" & "00010" & "00010",             -- [8] ADDI X2, X2, #5 (should NOT happen)
-    --    ADDI & "000000000100" & "00011" & "00011",             -- [9] ADDI X3, X3, #4 (should happen)
-    --    ADDI & "000000000111" & "00100" & "00100",             -- [10] ADDI X4, X4, #7 (should happen)
-    --    B & "1111111111111111111111" & "0101",                 -- [11] B <-9> -> (4 * 32)
-    --    NOP & "0000000000",
-    --    NOP & "0000000000"
-    --);
 begin
     uut : CPU port map (
         clk => clk,
@@ -159,11 +123,6 @@ begin
     begin
         I_instr <= rom_memory(0);
         wait until O_PC'event;
-        
-        --while to_integer(unsigned(O_PC)) < SIZE loop
-        --    I_instr <= rom_memory(to_integer(unsigned(O_PC)));
-        --    wait until O_PC'event;
-        --end loop;
         
         for i in 1 to SIZE loop
             if to_integer(unsigned(O_PC)) < SIZE then
