@@ -102,25 +102,6 @@ architecture Behavior of cpu_tb is
         ADDI & "000000000010" & "00101" & "00101",             -- ADDI X5, X5, #2        (X5 == 12)
         NOP & "0000000000"
     );
-    
-    --constant SIZE : integer := 14;
-    --type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
-    --signal rom_memory : instr_memory := (
-    --    B & "0000000000000000000000" & "0100",                   -- [0] B <4> -> (4 * 32)
-    --    ADDI & "000000000001" & "00000" & "00000",             -- [1] ADDI X0, X0, #1 (should NOT happen)
-    --    ADDI & "000000000001" & "00001" & "00001",             -- [2] ADDI X1, X1, #1 (should NOT happen)
-    --    ADDI & "000000000001" & "00010" & "00010",             -- [3] ADDI X2, X2, #1 (should NOT happen)
-    --    ADDI & "000000000100" & "00011" & "00011",             -- [4] ADDI X3, X3, #4 (should happen)
-    --    B & "0000000000000000000000" & "0100",                 -- [5] B <4> -> (4 * 32)
-    --    ADDI & "000000000010" & "00000" & "00000",             -- [6] ADDI X0, X0, #2 (should NOT happen)
-    --    ADDI & "000000000101" & "00001" & "00001",             -- [7] ADDI X1, X1, #5 (should NOT happen)
-    --    ADDI & "000000000101" & "00010" & "00010",             -- [8] ADDI X2, X2, #5 (should NOT happen)
-    --    ADDI & "000000000100" & "00011" & "00011",             -- [9] ADDI X3, X3, #4 (should happen)
-    --    ADDI & "000000000111" & "00100" & "00100",             -- [10] ADDI X4, X4, #7 (should happen)
-    --    B & "1111111111111111111111" & "0101",                 -- [11] B <-9> -> (4 * 32)
-    --    NOP & "0000000000",
-    --    NOP & "0000000000"
-    --);
 begin
     uut : CPU port map (
         clk => clk,
