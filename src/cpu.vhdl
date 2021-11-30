@@ -107,6 +107,7 @@ architecture Behavior of CPU is
     -- Pipeline and program counter signals
     signal PC : std_logic_vector(31 downto 0) := X"00000000";
     signal IF_stall, MEM_stall, Cond_Br : std_logic := '0';
+    signal Cp_Rn, Cp_Rm : std_logic := '0';
     signal WB_stall, Br : integer := 0;
 begin
     -- Connect the decoder
@@ -152,10 +153,11 @@ begin
     );
 
     process (clk)
-        variable type_I, type_C : boolean := false;
+        variable type_I, type_R, type_C : boolean := false;
         variable Should_Br : boolean := false;
     begin
         type_I := false;
+        type_R := false;
         type_C := false;
         Should_Br := false;
         
@@ -195,6 +197,7 @@ begin
                         when "10001011000" =>
                             ALU_Op1 <= "0010";
                             RegWrite <= '1';
+                            type_R := true;
                             
                         -- SUB
                         when "11001011000" =>
@@ -202,16 +205,19 @@ begin
                             sel_B <= Rn;
                             ALU_Op1 <= "0110";
                             RegWrite <= '1';
+                            type_R := true;
                         
                         -- AND
                         when "10001010000" =>
                             ALU_Op1 <= "0000";
                             RegWrite <= '1';
+                            type_R := true;
                         
                         -- OR
                         when "10101010000" =>
                             ALU_Op1 <= "0001";
                             RegWrite <= '1';
+                            type_R := true;
                         
                         -- LSL
                         when "11010011011" =>
@@ -219,6 +225,7 @@ begin
                             Imm_S2 <= "000000" & shamt;
                             RegWrite <= '1';
                             srcImm <= '1';
+                            type_R := true;
                         
                         -- LSR
                         when "11010011010" =>
@@ -226,6 +233,7 @@ begin
                             Imm_S2 <= "000000" & shamt;
                             RegWrite <= '1';
                             srcImm <= '1';
+                            type_R := true;
                     
                         when others =>
                         
@@ -334,21 +342,18 @@ begin
                         if rn = sel_d_1 then
                             IF_stall <= '1';
                         end if;
+                    elsif type_R then
+                        if rn = sel_d_1 then
+                            Cp_Rm <= '1';
+                        end if;
+                        if rm = sel_d_1 then
+                            Cp_Rn <= '1';
+                        end if;
                     elsif type_C then
                         if rn = sel_d_1 or rd = sel_d_1 then
                             IF_stall <= '1';
                         end if;
                     end if;
-                    --if opcode = "0100011" then
-                    --elsif opcode = "0000011" then
-                    --elsif opcode = "0000000" then
-                    --else
-                        --if not is_X(sel_D) then
-                        --if sel_D_1 = sel_A or sel_D_1 = sel_B then
-                        --    IF_stall <= '1';
-                        --end if;
-                        --end if;
-                    --end if;
                 elsif stage = 2 and IF_stall = '1' then
                     IF_stall <= '0';
                 elsif stage = 2 and Br > 0 then
@@ -365,12 +370,21 @@ begin
                     ALU_Op <= ALU_Op1;
                     SetFlags2 <= SetFlags;
                     
-                    A <= O_dataA;
+                    --if Cp_Rn = '1' then
+                    --    A <= Result;
+                    --    Cp_Rn <= '0';
+                    --else
+                        A <= O_dataA;
+                    --end if;
+                    
                     if srcImm = '1' then
                         B <= "00000000000000000000" & Imm_S2;
                     elsif Reg2Loc = '1' then
                         A <= O_dataA;
                         B <= X"00000000";
+                    elsif Cp_Rn = '1' then
+                        B <= Result;
+                        Cp_Rn <= '0';
                     else
                         B <= O_dataB;
                     end if;
