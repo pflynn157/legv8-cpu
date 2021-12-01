@@ -398,6 +398,10 @@ begin
                                 PC <= std_logic_vector((signed(PC)) + (signed("000000" & BR_address2) - 2));
                                 O_PC <= PC;
                                 Br <= 2;
+                            else
+                                PC <= std_logic_vector(unsigned(PC) + 1);
+                                instr <= I_instr;
+                                O_PC <= PC;
                             end if;
                             
                         -- BNE
@@ -406,6 +410,10 @@ begin
                                 PC <= std_logic_vector((signed(PC)) + (signed("000000" & BR_address2) - 2));
                                 O_PC <= PC;
                                 Br <= 2;
+                            else
+                                PC <= std_logic_vector(unsigned(PC) + 1);
+                                instr <= I_instr;
+                                O_PC <= PC;
                             end if;
                             
                         -- BLT
@@ -414,6 +422,10 @@ begin
                                 PC <= std_logic_vector((signed(PC)) + (signed("000000" & BR_address2) - 2));
                                 O_PC <= PC;
                                 Br <= 2;
+                            else
+                                PC <= std_logic_vector(unsigned(PC) + 1);
+                                instr <= I_instr;
+                                O_PC <= PC;
                             end if;
                             
                         -- BLE
@@ -422,6 +434,10 @@ begin
                                 PC <= std_logic_vector((signed(PC)) + (signed("000000" & BR_address2) - 2));
                                 O_PC <= PC;
                                 Br <= 2;
+                            else
+                                PC <= std_logic_vector(unsigned(PC) + 1);
+                                instr <= I_instr;
+                                O_PC <= PC;
                             end if;
                             
                         -- BGT
@@ -430,6 +446,10 @@ begin
                                 PC <= std_logic_vector((signed(PC)) + (signed("000000" & BR_address2) - 2));
                                 O_PC <= PC;
                                 Br <= 2;
+                            else
+                                PC <= std_logic_vector(unsigned(PC) + 1);
+                                instr <= I_instr;
+                                O_PC <= PC;
                             end if;
                             
                         -- BGE
@@ -438,6 +458,10 @@ begin
                                 PC <= std_logic_vector((signed(PC)) + (signed("000000" & BR_address2) - 2));
                                 O_PC <= PC;
                                 Br <= 2;
+                            else
+                                PC <= std_logic_vector(unsigned(PC) + 1);
+                                instr <= I_instr;
+                                O_PC <= PC;
                             end if;
                             
                         when others =>

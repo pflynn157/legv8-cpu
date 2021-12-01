@@ -1,15 +1,15 @@
 [*]
-[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Thu Nov 25 17:06:31 2021
+[*] GTKWave Analyzer v3.3.108 (w)1999-2020 BSI
+[*] Wed Dec  1 19:17:30 2021
 [*]
-[dumpfile] "/home/patrick/Projects/legv8-cpu/sim/br2_cpu.ghw"
-[dumpfile_mtime] "Thu Nov 25 17:06:08 2021"
-[dumpfile_size] 2105798
-[savefile] "/home/patrick/Projects/legv8-cpu/cpu_br2.gtkw"
+[dumpfile] "/home/patrick/Projects/legv8_cpu/sim/br2_cpu.ghw"
+[dumpfile_mtime] "Wed Dec  1 19:16:41 2021"
+[dumpfile_size] 2105819
+[savefile] "/home/patrick/Projects/legv8_cpu/cpu_br2.gtkw"
 [timestart] 0
-[size] 1920 1020
+[size] 1920 1033
 [pos] -1 -1
-*-26.481968 25000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-26.567204 25000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.br2_tb.
 [treeopen] top.br2_tb.mem_uut.mem.[2].
@@ -17,7 +17,7 @@
 [sst_width] 241
 [signals_width] 245
 [sst_expanded] 1
-[sst_vpaned_height] 306
+[sst_vpaned_height] 319
 @28
 top.br2_tb.clk
 top.br2_tb.reset

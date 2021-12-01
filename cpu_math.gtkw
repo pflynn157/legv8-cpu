@@ -1,15 +1,15 @@
 [*]
-[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Mon Nov 29 14:37:14 2021
+[*] GTKWave Analyzer v3.3.108 (w)1999-2020 BSI
+[*] Wed Dec  1 19:18:04 2021
 [*]
-[dumpfile] "/home/patrick/Projects/legv8-cpu/sim/math_cpu.ghw"
-[dumpfile_mtime] "Mon Nov 29 14:32:49 2021"
-[dumpfile_size] 2101633
-[savefile] "/home/patrick/Projects/legv8-cpu/cpu_math.gtkw"
+[dumpfile] "/home/patrick/Projects/legv8_cpu/sim/math_cpu.ghw"
+[dumpfile_mtime] "Wed Dec  1 19:16:43 2021"
+[dumpfile_size] 2101654
+[savefile] "/home/patrick/Projects/legv8_cpu/cpu_math.gtkw"
 [timestart] 0
-[size] 1920 1020
-[pos] -1 -1
-*-25.567204 25000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 1920 1033
+[pos] 1919 -1
+*-25.344812 285000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.math_tb.
 [treeopen] top.math_tb.mem_uut.mem.[2].
@@ -17,7 +17,7 @@
 [sst_width] 241
 [signals_width] 245
 [sst_expanded] 1
-[sst_vpaned_height] 306
+[sst_vpaned_height] 319
 @28
 top.math_tb.clk
 top.math_tb.reset
