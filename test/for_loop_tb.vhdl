@@ -80,7 +80,7 @@ architecture Behavior of for_loop_tb is
     -- for (int i = 0; i<10; i++) {
     --    n += i;
     -- }
-    constant SIZE : integer := 18;
+    constant SIZE : integer := 19;
     type instr_memory is array (0 to (SIZE - 1)) of std_logic_vector(31 downto 0);
     signal rom_memory : instr_memory := (
         MOV & "11111" & "00000",                                 -- MOV X0, XZR
@@ -89,16 +89,17 @@ architecture Behavior of for_loop_tb is
         ADDI & "000000001010" & "11111" & "00010",               -- ADDI X2, XZR, #10
         NOP & "0000000000",                                      -- NOP
         CMP & "00" & "000000000000" & "00001" & "00010",         -- CMP X1, X2
-        BC & "0000000000000000000111" & BGE,                     -- BGE 7
+        BC & "0000000000000000001001" & BGE,                     -- BGE 9
         LDUR & "000000000" & "00" & "11111" & "00011",           -- LDUR X3, [XZR, #0]    == MEM(0)
-        ADD & "00000" & "000011" & "00001" & "00011",            -- ADD X3, X3, X1
         NOP & "0000000000",                                      -- NOP
-        STUR & "000000000" & "00" & "11111" & "00011",           -- STUR X3, [XZR, #0]    == MEM(0)
+        ADD & "00011" & "000000" & "00001" & "00100",            -- ADD X4, X3, X1
+        NOP & "0000000000",                                      -- NOP
+        STUR & "000000000" & "00" & "11111" & "00100",           -- STUR X4, [XZR, #0]    == MEM(0)
         ADDI & "000000000001" & "00001" & "00001",               -- ADDI X1 X1, #1
-        B & "1111111111111111111111" & "1000",                   -- B -9
+        B & "1111111111111111111111" & "0111",                   -- B -9
         NOP & "0000000000",                                      -- NOP
         NOP & "0000000000",                                      -- NOP
-        ADDI & "000000000000" & "11111" & "00001",               -- ADDI X1, XZR, #0
+        ADDI & "000000000000" & "11111" & "00000",               -- ADDI X1, XZR, #0
         NOP & "0000000000",                                      -- NOP
         NOP & "0000000000"                                       -- NOP
     );

@@ -1,15 +1,15 @@
 [*]
-[*] GTKWave Analyzer v3.3.108 (w)1999-2020 BSI
-[*] Wed Dec  1 19:12:39 2021
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Thu Dec  2 14:14:34 2021
 [*]
-[dumpfile] "/home/patrick/Projects/legv8_cpu/sim/for_loop_cpu.ghw"
-[dumpfile_mtime] "Wed Dec  1 19:12:14 2021"
-[dumpfile_size] 2098300
-[savefile] "/home/patrick/Projects/legv8_cpu/cpu_for_loop.gtkw"
+[dumpfile] "/home/patrick/Projects/legv8-cpu/sim/for_loop_cpu.ghw"
+[dumpfile_mtime] "Thu Dec  2 14:14:16 2021"
+[dumpfile_size] 2132348
+[savefile] "/home/patrick/Projects/legv8-cpu/cpu_for_loop.gtkw"
 [timestart] 0
-[size] 1920 1033
+[size] 1920 1020
 [pos] -1 -1
-*-28.007776 235000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-28.029457 1898000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
 [treeopen] top.for_loop_tb.
 [treeopen] top.for_loop_tb.mem_uut.mem.[2].
@@ -105,8 +105,9 @@ top.for_loop_tb.mem_uut.i_write
 #{top.for_loop_tb.mem_uut.o_data[31:0]} top.for_loop_tb.mem_uut.o_data[31] top.for_loop_tb.mem_uut.o_data[30] top.for_loop_tb.mem_uut.o_data[29] top.for_loop_tb.mem_uut.o_data[28] top.for_loop_tb.mem_uut.o_data[27] top.for_loop_tb.mem_uut.o_data[26] top.for_loop_tb.mem_uut.o_data[25] top.for_loop_tb.mem_uut.o_data[24] top.for_loop_tb.mem_uut.o_data[23] top.for_loop_tb.mem_uut.o_data[22] top.for_loop_tb.mem_uut.o_data[21] top.for_loop_tb.mem_uut.o_data[20] top.for_loop_tb.mem_uut.o_data[19] top.for_loop_tb.mem_uut.o_data[18] top.for_loop_tb.mem_uut.o_data[17] top.for_loop_tb.mem_uut.o_data[16] top.for_loop_tb.mem_uut.o_data[15] top.for_loop_tb.mem_uut.o_data[14] top.for_loop_tb.mem_uut.o_data[13] top.for_loop_tb.mem_uut.o_data[12] top.for_loop_tb.mem_uut.o_data[11] top.for_loop_tb.mem_uut.o_data[10] top.for_loop_tb.mem_uut.o_data[9] top.for_loop_tb.mem_uut.o_data[8] top.for_loop_tb.mem_uut.o_data[7] top.for_loop_tb.mem_uut.o_data[6] top.for_loop_tb.mem_uut.o_data[5] top.for_loop_tb.mem_uut.o_data[4] top.for_loop_tb.mem_uut.o_data[3] top.for_loop_tb.mem_uut.o_data[2] top.for_loop_tb.mem_uut.o_data[1] top.for_loop_tb.mem_uut.o_data[0]
 @200
 -
-@22
+@25
 #{top.for_loop_tb.mem_uut.mem[0][0][7:0]} top.for_loop_tb.mem_uut.mem[0][0][7] top.for_loop_tb.mem_uut.mem[0][0][6] top.for_loop_tb.mem_uut.mem[0][0][5] top.for_loop_tb.mem_uut.mem[0][0][4] top.for_loop_tb.mem_uut.mem[0][0][3] top.for_loop_tb.mem_uut.mem[0][0][2] top.for_loop_tb.mem_uut.mem[0][0][1] top.for_loop_tb.mem_uut.mem[0][0][0]
+@22
 #{top.for_loop_tb.mem_uut.mem[0][1][7:0]} top.for_loop_tb.mem_uut.mem[0][1][7] top.for_loop_tb.mem_uut.mem[0][1][6] top.for_loop_tb.mem_uut.mem[0][1][5] top.for_loop_tb.mem_uut.mem[0][1][4] top.for_loop_tb.mem_uut.mem[0][1][3] top.for_loop_tb.mem_uut.mem[0][1][2] top.for_loop_tb.mem_uut.mem[0][1][1] top.for_loop_tb.mem_uut.mem[0][1][0]
 #{top.for_loop_tb.mem_uut.mem[0][2][7:0]} top.for_loop_tb.mem_uut.mem[0][2][7] top.for_loop_tb.mem_uut.mem[0][2][6] top.for_loop_tb.mem_uut.mem[0][2][5] top.for_loop_tb.mem_uut.mem[0][2][4] top.for_loop_tb.mem_uut.mem[0][2][3] top.for_loop_tb.mem_uut.mem[0][2][2] top.for_loop_tb.mem_uut.mem[0][2][1] top.for_loop_tb.mem_uut.mem[0][2][0]
 #{top.for_loop_tb.mem_uut.mem[0][3][7:0]} top.for_loop_tb.mem_uut.mem[0][3][7] top.for_loop_tb.mem_uut.mem[0][3][6] top.for_loop_tb.mem_uut.mem[0][3][5] top.for_loop_tb.mem_uut.mem[0][3][4] top.for_loop_tb.mem_uut.mem[0][3][3] top.for_loop_tb.mem_uut.mem[0][3][2] top.for_loop_tb.mem_uut.mem[0][3][1] top.for_loop_tb.mem_uut.mem[0][3][0]
