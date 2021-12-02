@@ -1,13 +1,13 @@
 [*]
-[*] GTKWave Analyzer v3.3.108 (w)1999-2020 BSI
-[*] Wed Nov 24 14:02:18 2021
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Thu Dec  2 14:18:02 2021
 [*]
-[dumpfile] "/home/patrick/Projects/legv8_cpu/sim/br1_cpu.ghw"
-[dumpfile_mtime] "Wed Nov 24 14:01:52 2021"
-[dumpfile_size] 2095422
-[savefile] "/home/patrick/Projects/legv8_cpu/cpu_br1.gtkw"
+[dumpfile] "/home/patrick/Projects/legv8-cpu/sim/br1_cpu.ghw"
+[dumpfile_mtime] "Thu Dec  2 14:15:05 2021"
+[dumpfile_size] 2097550
+[savefile] "/home/patrick/Projects/legv8-cpu/cpu_br1.gtkw"
 [timestart] 0
-[size] 1920 1033
+[size] 1920 1020
 [pos] -1 -1
 *-25.567204 25000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] top.
